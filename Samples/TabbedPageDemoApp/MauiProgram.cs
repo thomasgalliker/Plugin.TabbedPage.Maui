@@ -38,8 +38,15 @@ namespace TabbedPageDemoApp
             builder.Services.AddSingleton<ILauncher>(_ => Launcher.Default);
 
             // Register pages and view models
-            builder.Services.AddTransient<MainPage>();
-            builder.Services.AddTransient<MainViewModel>();
+            builder.Services.AddTransient<TabbedMainPage>();
+            builder.Services.AddTransient<TabbedMainViewModel>();
+
+            builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<HomeViewModel>();
+
+            builder.Services.AddTransient<CarTireAlertPage>();
+            builder.Services.AddTransient<AccountPage>();
+            builder.Services.AddTransient<ChatPage>();
 
             return builder.Build();
         }

@@ -8,8 +8,8 @@ namespace TabbedPageDemoApp
         {
             this.InitializeComponent();
 
-            var mainPage = serviceProvider.GetRequiredService<MainPage>();
-            this.MainPage = new NavigationPage(mainPage);
+            var tabbedMainPage = serviceProvider.GetRequiredService<TabbedMainPage>();
+            this.MainPage = tabbedMainPage;
         }
     }
 }

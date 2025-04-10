@@ -4,7 +4,6 @@ namespace Plugin.TabbedPage.Maui.Utils
 {
     internal static class ReflectionHelper
     {
-
         public static T GetPropertyValue<T>(object obj, string propertyName)
         {
             return (T)GetPropertyValue(obj, propertyName);
