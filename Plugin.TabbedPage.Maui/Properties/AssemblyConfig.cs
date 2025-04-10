@@ -4,5 +4,5 @@
 [assembly: InternalsVisibleTo("TabbedPageDemoApp")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
-[assembly: XmlnsDefinition("http://Plugin.TabbedPage.Maui", "Plugin.TabbedPage.Maui")]
-[assembly: XmlnsDefinition("http://Plugin.TabbedPage.Maui", "Plugin.TabbedPage.Maui.Controls")]
+[assembly: XmlnsDefinition("http://plugin.tabbedpage.maui", "Plugin.TabbedPage.Maui")]
+[assembly: XmlnsDefinition("http://plugin.tabbedpage.maui", "Plugin.TabbedPage.Maui.Controls")]
