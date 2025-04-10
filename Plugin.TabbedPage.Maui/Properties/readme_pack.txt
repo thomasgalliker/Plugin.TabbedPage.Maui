@@ -1,0 +1,1 @@
+﻿dotnet pack .\Plugin.TabbedPage.Maui\Plugin.TabbedPage.Maui.csproj /p:Version=1.0.0-pre
