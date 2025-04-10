@@ -75,7 +75,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             "BadgePosition",
             typeof(BadgePosition),
             typeof(TabBadge),
-            BadgePosition.PositionTopRight);
+            BadgePosition.TopRight);
 
         public static BadgePosition GetBadgePosition(BindableObject view)
         {

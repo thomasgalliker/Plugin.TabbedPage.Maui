@@ -239,31 +239,31 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
                 layoutParameters.Gravity = GravityFlags.Center;
                 switch (this.Postion)
                 {
-                    case BadgePosition.PositionTopLeft:
+                    case BadgePosition.TopLeft:
                         layoutParameters.SetMargins(this.badgeMarginL - w, this.badgeMarginT - h, 0, 0);
                         break;
-                    case BadgePosition.PositionTopRight:
+                    case BadgePosition.TopRight:
                         layoutParameters.SetMargins(0, this.badgeMarginT - h, this.badgeMarginR - w, 0);
                         break;
-                    case BadgePosition.PositionBottomLeft:
+                    case BadgePosition.BottomLeft:
                         layoutParameters.SetMargins(this.badgeMarginL - w, 0, 0, 0 + this.badgeMarginB - h);
                         break;
-                    case BadgePosition.PositionBottomRight:
+                    case BadgePosition.BottomRight:
                         layoutParameters.SetMargins(0, 0, this.badgeMarginR - w, 0 + this.badgeMarginB - h);
                         break;
-                    case BadgePosition.PositionCenter:
+                    case BadgePosition.Center:
                         layoutParameters.SetMargins(this.badgeMarginL, this.badgeMarginT, this.badgeMarginR, this.badgeMarginB);
                         break;
-                    case BadgePosition.PositionTopCenter:
+                    case BadgePosition.TopCenter:
                         layoutParameters.SetMargins(0, 0 + this.badgeMarginT - h, 0, 0);
                         break;
-                    case BadgePosition.PositionBottomCenter:
+                    case BadgePosition.BottomCenter:
                         layoutParameters.SetMargins(0, 0, 0, 0 + this.badgeMarginB - h);
                         break;
-                    case BadgePosition.PositionLeftCenter:
+                    case BadgePosition.LeftCenter:
                         layoutParameters.SetMargins(this.badgeMarginL - w, 0, 0, 0);
                         break;
-                    case BadgePosition.PositionRightCenter:
+                    case BadgePosition.RightCenter:
                         layoutParameters.SetMargins(0, 0, this.badgeMarginR - w, 0);
                         break;
                 }
@@ -272,39 +272,39 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             {
                 switch (this.Postion)
                 {
-                    case BadgePosition.PositionTopLeft:
+                    case BadgePosition.TopLeft:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Top;
                         layoutParameters.SetMargins(this.badgeMarginL, this.badgeMarginT, 0, 0);
                         break;
-                    case BadgePosition.PositionTopRight:
+                    case BadgePosition.TopRight:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Top;
                         layoutParameters.SetMargins(0, this.badgeMarginT, this.badgeMarginR, 0);
                         break;
-                    case BadgePosition.PositionBottomLeft:
+                    case BadgePosition.BottomLeft:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Bottom;
                         layoutParameters.SetMargins(this.badgeMarginL, 0, 0, this.badgeMarginB);
                         break;
-                    case BadgePosition.PositionBottomRight:
+                    case BadgePosition.BottomRight:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Bottom;
                         layoutParameters.SetMargins(0, 0, this.badgeMarginR, this.badgeMarginB);
                         break;
-                    case BadgePosition.PositionCenter:
+                    case BadgePosition.Center:
                         layoutParameters.Gravity = GravityFlags.Center;
                         layoutParameters.SetMargins(0, 0, 0, 0);
                         break;
-                    case BadgePosition.PositionTopCenter:
+                    case BadgePosition.TopCenter:
                         layoutParameters.Gravity = GravityFlags.Center | GravityFlags.Top;
                         layoutParameters.SetMargins(0, this.badgeMarginT, 0, 0);
                         break;
-                    case BadgePosition.PositionBottomCenter:
+                    case BadgePosition.BottomCenter:
                         layoutParameters.Gravity = GravityFlags.Center | GravityFlags.Bottom;
                         layoutParameters.SetMargins(0, 0, 0, this.badgeMarginB);
                         break;
-                    case BadgePosition.PositionLeftCenter:
+                    case BadgePosition.LeftCenter:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Center;
                         layoutParameters.SetMargins(this.badgeMarginL, 0, 0, 0);
                         break;
-                    case BadgePosition.PositionRightCenter:
+                    case BadgePosition.RightCenter:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Center;
                         layoutParameters.SetMargins(0, 0, this.badgeMarginR, 0);
                         break;

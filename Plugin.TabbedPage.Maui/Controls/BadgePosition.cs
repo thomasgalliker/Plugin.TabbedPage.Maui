@@ -2,14 +2,14 @@ namespace Plugin.TabbedPage.Maui.Controls
 {
     public enum BadgePosition
     {
-        PositionTopRight = 0,
-        PositionTopLeft = 1,
-        PositionBottomRight = 2,
-        PositionBottomLeft = 3,
-        PositionCenter = 4,
-        PositionTopCenter = 5,
-        PositionBottomCenter = 6,
-        PositionLeftCenter = 7,
-        PositionRightCenter = 8,
+        TopRight = 0,
+        TopLeft = 1,
+        BottomRight = 2,
+        BottomLeft = 3,
+        Center = 4,
+        TopCenter = 5,
+        BottomCenter = 6,
+        LeftCenter = 7,
+        RightCenter = 8,
     }
 }
