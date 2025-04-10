@@ -4,7 +4,11 @@ namespace Plugin.TabbedPage.Maui.Controls
 {
     public class Badge : Frame
     {
-        public static BindableProperty BadgeTextProperty = BindableProperty.Create(nameof(BadgeText), typeof(string), typeof(Badge), default(string), propertyChanged: BadgePropertyChanged);
+        public static BindableProperty BadgeTextProperty = BindableProperty.Create(
+            nameof(BadgeText),
+            typeof(string),
+            typeof(Badge),
+            propertyChanged: BadgePropertyChanged);
 
         public string BadgeText
         {
@@ -12,7 +16,11 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeTextProperty, value);
         }
 
-        public static BindableProperty BadgeTextColorProperty = BindableProperty.Create(nameof(BadgeTextColor), typeof(Color), typeof(Badge), null, propertyChanged: BadgePropertyChanged);
+        public static BindableProperty BadgeTextColorProperty = BindableProperty.Create(
+            nameof(BadgeTextColor),
+            typeof(Color),
+            typeof(Badge),
+            propertyChanged: BadgePropertyChanged);
 
         public Color BadgeTextColor
         {
@@ -20,7 +28,12 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeTextColorProperty, value);
         }
 
-        public static BindableProperty BadgeFontAttributesProperty = BindableProperty.Create(nameof(BadgeFontAttributes), typeof(FontAttributes), typeof(Badge), FontAttributes.Bold, propertyChanged: BadgePropertyChanged);
+        public static BindableProperty BadgeFontAttributesProperty = BindableProperty.Create(
+            nameof(BadgeFontAttributes),
+            typeof(FontAttributes),
+            typeof(Badge),
+            FontAttributes.Bold,
+            propertyChanged: BadgePropertyChanged);
 
         public FontAttributes BadgeFontAttributes
         {
@@ -28,7 +41,12 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeFontAttributesProperty, value);
         }
 
-        public static BindableProperty BadgeFontFamilyProperty = BindableProperty.Create(nameof(BadgeFontFamily), typeof(string), typeof(Badge), Font.Default.Family, propertyChanged: BadgePropertyChanged);
+        public static BindableProperty BadgeFontFamilyProperty = BindableProperty.Create(
+            nameof(BadgeFontFamily),
+            typeof(string),
+            typeof(Badge),
+            Font.Default.Family,
+            propertyChanged: BadgePropertyChanged);
 
         public string BadgeFontFamily
         {
@@ -36,7 +54,12 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeFontFamilyProperty, value);
         }
 
-        public static BindableProperty BadgeFontSizeProperty = BindableProperty.Create(nameof(BadgeFontSizeProperty), typeof(double), typeof(Badge), 8.0, propertyChanged: BadgePropertyChanged);
+        public static BindableProperty BadgeFontSizeProperty = BindableProperty.Create(
+            nameof(BadgeFontSizeProperty),
+            typeof(double),
+            typeof(Badge),
+            8.0,
+            propertyChanged: BadgePropertyChanged);
 
         public double BadgeFontSize
         {
