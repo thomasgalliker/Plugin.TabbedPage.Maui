@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="TabbedPageDemoApp.Views.HomePage"
-             Title="HomePage">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:TabbedPageDemoApp.Controls"
+    xmlns:t="http://plugin.tabbedpage.maui"
+    x:Class="TabbedPageDemoApp.Views.HomePage"
+    Title="HomePage"
+    t:TabBadge.BadgeText="1"
+    IconImageSource="{controls:ImageResource ic_chevron_down}">
+
     <VerticalStackLayout>
-        <Label 
+        <Label
             Text="TabbedPage extensions for .NET MAUI"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+            HorizontalOptions="Center"
+            VerticalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>

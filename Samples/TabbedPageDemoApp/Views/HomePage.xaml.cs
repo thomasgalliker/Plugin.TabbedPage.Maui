@@ -1,9 +1,13 @@
-namespace TabbedPageDemoApp.Views;
+using TabbedPageDemoApp.ViewModels;
 
-public partial class HomePage : ContentPage
+namespace TabbedPageDemoApp.Views
 {
-	public HomePage()
-	{
-        this.InitializeComponent();
-	}
+    public partial class HomePage : ContentPage
+    {
+        public HomePage()
+        {
+            this.InitializeComponent();
+            this.BindingContext = IPlatformApplication.Current.Services.GetService<HomeViewModel>();
+        }
+    }
 }

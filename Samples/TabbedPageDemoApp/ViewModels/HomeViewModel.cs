@@ -4,7 +4,7 @@ using TabbedPageDemoApp.Services;
 
 namespace TabbedPageDemoApp.ViewModels
 {
-    public class MainViewModel : ObservableObject
+    public class HomeViewModel : ObservableObject
     {
         private readonly INavigationService navigationService;
         private readonly ILauncher launcher;
@@ -12,7 +12,7 @@ namespace TabbedPageDemoApp.ViewModels
         private IAsyncRelayCommand<string> navigateToPageCommand;
         private IAsyncRelayCommand<string> openUrlCommand;
 
-        public MainViewModel(
+        public HomeViewModel(
             INavigationService navigationService,
             ILauncher launcher)
         {
