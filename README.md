@@ -32,3 +32,5 @@ Contributors welcome! If you find a bug or want to propose a new feature, feel f
 
 ### Links
 - https://github.com/xabre/xamarin-forms-tab-badge
+- https://github.com/dotnet/maui/blob/main/src/Controls/src/Core/Platform/Android/TabbedPageManager.cs
+- https://github.com/vmontoyagtz/SaamBk/blob/85d605f7a4e458aaa39b5e9d4f6871c7802c53e0/src/SaamApp.MauiApps/eShopOnContainers/Controls/CustomTabbedPage.cs#L5
