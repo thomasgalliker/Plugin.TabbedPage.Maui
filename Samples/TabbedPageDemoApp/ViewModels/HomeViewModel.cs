@@ -11,6 +11,7 @@ namespace TabbedPageDemoApp.ViewModels
 
         private IAsyncRelayCommand<string> navigateToPageCommand;
         private IAsyncRelayCommand<string> openUrlCommand;
+        private int? counter;
 
         public HomeViewModel(
             INavigationService navigationService,
@@ -18,6 +19,12 @@ namespace TabbedPageDemoApp.ViewModels
         {
             this.navigationService = navigationService;
             this.launcher = launcher;
+        }
+
+        public int? Counter
+        {
+            get => this.counter <= 0 ? null : this.counter;
+            set => this.SetProperty(ref this.counter, value);
         }
 
         public IAsyncRelayCommand<string> NavigateToPageCommand
