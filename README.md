@@ -1,6 +1,6 @@
 # Extended TabbedPage features for .NET MAUI
 
-[![Version](https://img.shields.io/nuget/v/Plugin.TabbedPage.Maui.svg)](https://www.nuget.org/packages/Plugin.TabbedPage.Maui)  [![Downloads](https://img.shields.io/nuget/dt/Plugin.TabbedPage.Maui.svg)](https://www.nuget.org/packages/Plugin.TabbedPage.Maui)
+[![Version](https://img.shields.io/nuget/v/Plugin.TabbedPage.Maui.svg)](https://www.nuget.org/packages/Plugin.TabbedPage.Maui) [![Downloads](https://img.shields.io/nuget/dt/Plugin.TabbedPage.Maui.svg)](https://www.nuget.org/packages/Plugin.TabbedPage.Maui) [![Buy Me a Coffee](https://img.shields.io/badge/support-buy%20me%20a%20coffee-FFDD00)](https://buymeacoffee.com/thomasgalliker)
 
 This library extends the existing TabbedPage in .NET MAUI with new features such as badge text.
 
