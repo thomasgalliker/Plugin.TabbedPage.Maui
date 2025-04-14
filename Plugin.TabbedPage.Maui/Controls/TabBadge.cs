@@ -1,13 +1,10 @@
 using Font = Microsoft.Maui.Font;
-using Page = Microsoft.Maui.Controls.Page;
 
 namespace Plugin.TabbedPage.Maui.Controls
 {
-    using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
-
     public static class TabBadge
     {
-        public static BindableProperty BadgeTextProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgeTextProperty = BindableProperty.CreateAttached(
             "BadgeText",
             typeof(string),
             typeof(TabBadge),
@@ -23,7 +20,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeTextProperty, value);
         }
 
-        public static BindableProperty BadgeColorProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgeColorProperty = BindableProperty.CreateAttached(
             "BadgeColor",
             typeof(Color),
             typeof(TabBadge),
@@ -39,7 +36,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeColorProperty, value);
         }
 
-        public static BindableProperty BadgeTextColorProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgeTextColorProperty = BindableProperty.CreateAttached(
             "BadgeTextColor",
             typeof(Color),
             typeof(TabBadge),
@@ -55,7 +52,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeTextColorProperty, value);
         }
 
-        public static BindableProperty BadgeFontProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgeFontProperty = BindableProperty.CreateAttached(
             "BadgeFont",
             typeof(Font),
             typeof(TabBadge),
@@ -71,7 +68,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeFontProperty, value);
         }
 
-        public static BindableProperty BadgePositionProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgePositionProperty = BindableProperty.CreateAttached(
             "BadgePosition",
             typeof(BadgePosition),
             typeof(TabBadge),
@@ -87,11 +84,11 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgePositionProperty, value);
         }
 
-        public static BindableProperty BadgeMarginProperty = BindableProperty.CreateAttached(
+        public static readonly BindableProperty BadgeMarginProperty = BindableProperty.CreateAttached(
             "BadgeMargin",
             typeof(Thickness),
             typeof(TabBadge),
-            DefaultMargins);
+            GetDefaultBadgeMargin());
 
         public static Thickness GetBadgeMargin(BindableObject view)
         {
@@ -103,45 +100,15 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeMarginProperty, value);
         }
 
-        public static Thickness DefaultMargins
+        public static Thickness GetDefaultBadgeMargin()
         {
-            get
+            var currentPlatform = DeviceInfo.Current.Platform;
+            if (currentPlatform == DevicePlatform.Android)
             {
-                var currentPlatform = DeviceInfo.Current.Platform;
-                if (currentPlatform == DevicePlatform.Android)
-                {
-                    return new Thickness(0, 2, 2, 0);
-                }
-
-                return new Thickness(0);
-            }
-        }
-
-        /// <summary>
-        /// Internal use only. Attempts to get the badged child of a tabbed page (either navigation page or content page)
-        /// </summary>
-        /// <param name="parentTabbedPage">Tabbed page</param>
-        /// <param name="tabIndex">Index</param>
-        /// <returns>Page</returns>
-        internal static Page GetChildPageWithBadge(this TabbedPage parentTabbedPage, int tabIndex)
-        {
-            var element = parentTabbedPage.Children[tabIndex];
-            return element.GetPageWithBadge();
-        }
-
-        internal static Page GetPageWithBadge(this Page element)
-        {
-            if (GetBadgeText(element) != (string)BadgeTextProperty.DefaultValue)
-            {
-                return element;
+                return new Thickness(0, 2, 2, 0);
             }
 
-            if (element is NavigationPage navigationPage)
-            {
-                return navigationPage.RootPage;
-            }
-
-            return element;
+            return new Thickness(0);
         }
     }
 }

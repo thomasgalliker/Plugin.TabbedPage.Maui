@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
+using Plugin.TabbedPage.Maui.Utils;
 using UIKit;
 using Font = Microsoft.Maui.Font;
 using Page = Microsoft.Maui.Controls.Page;
@@ -45,7 +46,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            var element = this.Tabbed.GetChildPageWithBadge(tabIndex);
+            var element = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
             element.PropertyChanged += this.OnTabbedPagePropertyChanged;
 
             if (this.TabBar.Items.Length > tabIndex)
@@ -192,9 +193,9 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            foreach (var tab in tabbedPage.Children.Select(c => c.GetPageWithBadge()))
+            foreach (var page in tabbedPage.Children.Select(PageHelper.GetPageWithBadge))
             {
-                tab.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+                page.PropertyChanged -= this.OnTabbedPagePropertyChanged;
             }
 
             tabbedPage.ChildAdded -= this.OnTabAdded;

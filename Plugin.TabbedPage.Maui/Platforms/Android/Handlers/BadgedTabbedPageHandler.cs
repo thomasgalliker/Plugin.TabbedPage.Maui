@@ -105,7 +105,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            var page = this.TabbedPage.GetChildPageWithBadge(tabIndex);
+            var page = PageHelper.GetChildPageWithBadge(this.TabbedPage, tabIndex);
 
             AView targetView;
             var isBottomTabPlacement = this.IsBottomTabPlacement;
@@ -250,20 +250,20 @@ namespace Plugin.TabbedPage.Maui.Platform
             this.Cleanup(this.TabbedPage);
         }
 
-        private void Cleanup(TabbedPage page)
+        private void Cleanup(TabbedPage tabbedPage)
         {
-            if (page == null)
+            if (tabbedPage == null)
             {
                 return;
             }
 
-            foreach (var tab in page.Children.Select(c => c.GetPageWithBadge()))
+            foreach (var page in tabbedPage.Children.Select(PageHelper.GetPageWithBadge))
             {
-                tab.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+                page.PropertyChanged -= this.OnTabbedPagePropertyChanged;
             }
 
-            page.ChildRemoved -= this.OnTabRemoved;
-            page.ChildAdded -= this.OnTabAdded;
+            tabbedPage.ChildRemoved -= this.OnTabRemoved;
+            tabbedPage.ChildAdded -= this.OnTabAdded;
 
             this.badgeViews.Clear();
             this.topTabLayout = null;
