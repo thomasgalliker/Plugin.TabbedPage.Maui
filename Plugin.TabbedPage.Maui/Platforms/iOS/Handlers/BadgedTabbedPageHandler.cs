@@ -1,7 +1,10 @@
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
+using Plugin.TabbedPage.Maui.Extensions;
 using Plugin.TabbedPage.Maui.Utils;
 using UIKit;
 using Font = Microsoft.Maui.Font;
@@ -10,6 +13,7 @@ using TabbedRenderer = Microsoft.Maui.Controls.Handlers.Compatibility.TabbedRend
 
 namespace Plugin.TabbedPage.Maui.Platform
 {
+    using TabbedPageExtensions = Controls.TabbedPage;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
 
     [Preserve]
@@ -35,8 +39,95 @@ namespace Plugin.TabbedPage.Maui.Platform
                 this.AddTabBadge(i);
             }
 
+            this.UpdateTabBarAppearance(this.Tabbed);
+
             this.Tabbed.ChildAdded += this.OnTabAdded;
             this.Tabbed.ChildRemoved += this.OnTabRemoved;
+            this.Tabbed.PropertyChanged += this.OnTabbedPagePropertyChanged;
+        }
+
+        private void OnTabbedPagePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName||
+                e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
+            {
+                this.UpdateTabBarAppearance(this.Tabbed);
+            }
+        }
+
+        private void UpdateTabBarAppearance(TabbedPage tabbedPage)
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                return;
+            }
+
+            var fontFamily = TabbedPageExtensions.GetFontFamily(tabbedPage);
+            var fontSize = TabbedPageExtensions.GetFontSize(tabbedPage);
+            var fontAttributes = TabbedPageExtensions.GetFontAttributes(tabbedPage);
+
+            if (Equals(fontFamily, TabbedPageExtensions.FontFamilyProperty.DefaultValue) &&
+                Equals(fontSize, TabbedPageExtensions.FontSizeProperty.DefaultValue) &&
+                Equals(fontAttributes, TabbedPageExtensions.FontAttributesProperty.DefaultValue))
+            {
+                return;
+            }
+
+            var fontNormal = FontHelper.CreateFont(
+                fontFamily,
+                fontSize,
+                fontAttributes);
+
+            var fontManager = tabbedPage.Handler.GetRequiredService<IFontManager>();
+            var uiFontNormal = fontManager.GetFont(fontNormal);
+
+            if (!fontAttributes.HasFlag(FontAttributes.Bold))
+            {
+                fontNormal = fontNormal.WithWeight(FontWeight.Medium);
+            }
+
+            var uiFontSelected = fontManager.GetFont(fontNormal);
+
+            if (fontFamily != null)
+            {
+                var fontDescriptor = uiFontSelected.FontDescriptor.CreateWithTraits(UIFontDescriptorSymbolicTraits.Bold);
+                if (fontDescriptor != null)
+                {
+                    uiFontSelected = UIFont.FromDescriptor(fontDescriptor, 0.0f); // 0.0f - keep the same size
+                }
+            }
+
+            var tabBarItemAppearance = new UITabBarItemAppearance();
+
+            var normalAttributes = new UIStringAttributes
+            {
+                Font = uiFontNormal,
+                //ForegroundColor = UIColor.Green,
+            };
+
+            var selectedAttributes = new UIStringAttributes
+            {
+                Font = uiFontSelected,
+                //ForegroundColor = UIColor.Magenta,
+            };
+
+            tabBarItemAppearance.Normal.TitleTextAttributes = normalAttributes;
+            tabBarItemAppearance.Selected.TitleTextAttributes = selectedAttributes;
+
+            var tabBarAppearance = new UITabBarAppearance
+            {
+                InlineLayoutAppearance = tabBarItemAppearance,
+                StackedLayoutAppearance = tabBarItemAppearance,
+                CompactInlineLayoutAppearance = tabBarItemAppearance
+            };
+
+            UITabBar.Appearance.StandardAppearance = tabBarAppearance;
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                UITabBar.Appearance.ScrollEdgeAppearance = tabBarAppearance;
+            }
         }
 
         private void AddTabBadge(int tabIndex)
@@ -46,15 +137,15 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            var element = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
-            element.PropertyChanged += this.OnTabbedPagePropertyChanged;
+            var page = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
+            page.PropertyChanged += this.OnPagePropertyChanged;
 
             if (this.TabBar.Items.Length > tabIndex)
             {
                 var tabBarItem = this.TabBar.Items[tabIndex];
-                this.UpdateTabBadgeText(tabBarItem, element);
-                this.UpdateTabBadgeColor(tabBarItem, element);
-                this.UpdateTabBadgeTextAttributes(tabBarItem, element);
+                this.UpdateTabBadgeText(tabBarItem, page);
+                this.UpdateTabBadgeColor(tabBarItem, page);
+                this.UpdateTabBadgeTextAttributes(tabBarItem, page);
             }
         }
 
@@ -101,8 +192,10 @@ namespace Plugin.TabbedPage.Maui.Platform
             }
         }
 
-        private void OnTabbedPagePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnPagePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            Trace.WriteLine($"OnPagePropertyChanged: {e.PropertyName}");
+
             if (sender is not Page page)
             {
                 return;
@@ -176,7 +269,7 @@ namespace Plugin.TabbedPage.Maui.Platform
 
         private void OnTabRemoved(object sender, ElementEventArgs e)
         {
-            e.Element.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+            e.Element.PropertyChanged -= this.OnPagePropertyChanged;
         }
 
         protected override void Dispose(bool disposing)
@@ -195,11 +288,12 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             foreach (var page in tabbedPage.Children.Select(PageHelper.GetPageWithBadge))
             {
-                page.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+                page.PropertyChanged -= this.OnPagePropertyChanged;
             }
 
             tabbedPage.ChildAdded -= this.OnTabAdded;
             tabbedPage.ChildRemoved -= this.OnTabRemoved;
+            tabbedPage.PropertyChanged -= this.OnTabbedPagePropertyChanged;
         }
     }
 }

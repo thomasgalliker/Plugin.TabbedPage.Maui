@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+
 <TabbedPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:t="http://plugin.tabbedpage.maui"
     xmlns:views="clr-namespace:TabbedPageDemoApp.Views"
     xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.TabbedMainPage"
@@ -13,7 +15,13 @@
     android:TabbedPage.ToolbarPlacement="Bottom"
     ios:Page.UseSafeArea="True"
     ios:TabbedPage.TranslucencyMode="Opaque"
+    t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"
+    t:TabbedPage.FontSize="16"
     x:DataType="vm:TabbedMainViewModel">
+
+    <!--  t:TabbedPage.FontFamily="{StaticResource FontFamilyMonospace}"  -->
+    <!--  t:TabbedPage.FontSize="16"  -->
+    <!--  t:TabbedPage.FontAttributes="Bold"  -->
 
     <NavigationPage
         Title="Home"

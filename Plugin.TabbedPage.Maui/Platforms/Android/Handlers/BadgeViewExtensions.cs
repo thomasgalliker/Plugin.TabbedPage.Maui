@@ -4,6 +4,7 @@ using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
+using Plugin.TabbedPage.Maui.Extensions;
 using Font = Microsoft.Maui.Font;
 using Page = Microsoft.Maui.Controls.Page;
 using View = Android.Views.View;
@@ -12,39 +13,39 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
 {
     internal static class BadgeViewExtensions
     {
-        public static void UpdateFromElement(this BadgeView badgeView, Page element)
+        public static void UpdateFromElement(this BadgeView badgeView, Page page)
         {
             //get text
-            var badgeText = TabBadge.GetBadgeText(element);
+            var badgeText = TabBadge.GetBadgeText(page);
             badgeView.Text = badgeText;
 
             // set color if not default
-            var tabColor = TabBadge.GetBadgeColor(element);
+            var tabColor = TabBadge.GetBadgeColor(page);
             if (tabColor.IsNotDefault())
             {
                 badgeView.BadgeColor = tabColor.ToPlatform();
             }
 
             // set text color if not default
-            var tabTextColor = TabBadge.GetBadgeTextColor(element);
+            var tabTextColor = TabBadge.GetBadgeTextColor(page);
             if (tabTextColor.IsNotDefault())
             {
                 badgeView.TextColor = tabTextColor.ToPlatform();
             }
 
             // set font if not default
-            var font = TabBadge.GetBadgeFont(element);
+            var font = TabBadge.GetBadgeFont(page);
             if (font != Font.Default)
             {
-                badgeView.Typeface = font.ToTypeface((element.Handler ?? Application.Current.Handler).MauiContext.Services
+                badgeView.Typeface = font.ToTypeface((page.Handler ?? Application.Current.Handler).MauiContext.Services
                     .GetRequiredService<IFontManager>());
             }
 
-            var margin = TabBadge.GetBadgeMargin(element);
+            var margin = TabBadge.GetBadgeMargin(page);
             badgeView.SetMargins((float)margin.Left, (float)margin.Top, (float)margin.Right, (float)margin.Bottom);
 
             // set position
-            badgeView.Postion = TabBadge.GetBadgePosition(element);
+            badgeView.Postion = TabBadge.GetBadgePosition(page);
         }
 
         public static void UpdateFromPropertyChangedEvent(this BadgeView badgeView, Element element, PropertyChangedEventArgs e)

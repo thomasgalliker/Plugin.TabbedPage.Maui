@@ -11,10 +11,17 @@ using View = Android.Views.View;
 using Plugin.TabbedPage.Maui.Utils;
 using Plugin.TabbedPage.Maui.Controls;
 using System.Diagnostics;
+using Android.Graphics;
+using Android.Text;
+using Android.Text.Style;
+using Microsoft.Maui.Controls.PlatformConfiguration;
+using Plugin.TabbedPage.Maui.Extensions;
 using Plugin.TabbedPage.Maui.Platform.Handlers;
+using Button = Android.Widget.Button;
 
 namespace Plugin.TabbedPage.Maui.Platform
 {
+    using TabbedPageExtensions = Controls.TabbedPage;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
 
     public class BadgedTabbedPageHandler : TabbedViewHandler
@@ -31,7 +38,7 @@ namespace Plugin.TabbedPage.Maui.Platform
         protected TabbedPage TabbedPage => this.VirtualView as TabbedPage;
         protected ViewGroup ViewGroup => this.PlatformView as ViewGroup;
 
-        protected override void ConnectHandler(Android.Views.View platformView)
+        protected override void ConnectHandler(View platformView)
         {
             base.ConnectHandler(platformView);
 
@@ -70,6 +77,7 @@ namespace Plugin.TabbedPage.Maui.Platform
             if (this.IsBottomTabPlacement)
             {
                 this.bottomNavigationView = ReflectionHelper.GetFieldValue<BottomNavigationView>(tabbedPageManager, "_bottomNavigationView");
+                this.UpdateFont();
                 this.bottomTabStrip = this.bottomNavigationView?.GetChildAt(0) as ViewGroup;
                 if (this.bottomTabStrip == null)
                 {
@@ -86,6 +94,44 @@ namespace Plugin.TabbedPage.Maui.Platform
 
                 this.topTabStrip = this.topTabLayout.FindChildOfType<LinearLayout>();
             }
+        }
+
+        private void UpdateFont()
+        {
+            var fontFamily = TabbedPageExtensions.GetFontFamily(this.TabbedPage);
+            var fontSize = TabbedPageExtensions.GetFontSize(this.TabbedPage);
+            var fontAttributes = TabbedPageExtensions.GetFontAttributes(this.TabbedPage);
+
+            if (Equals(fontFamily, TabbedPageExtensions.FontFamilyProperty.DefaultValue) &&
+                Equals(fontSize, TabbedPageExtensions.FontSizeProperty.DefaultValue) &&
+                Equals(fontAttributes, TabbedPageExtensions.FontAttributesProperty.DefaultValue))
+            {
+                return;
+            }
+
+            var typefaceResolver = this.GetRequiredService<ITypefaceResolver>();
+            var typeface = typefaceResolver.GetTypeface(
+                fontFamily,
+                fontSize,
+                fontAttributes);
+
+            var fontSizePx = this.ConvertFontSizeFromDpToPx(fontSize);
+
+            var menu = this.bottomNavigationView.Menu;
+            for (var i = 0; i < this.bottomNavigationView.Menu.Size(); i++)
+            {
+                var menuItem = menu.GetItem(i);
+                var title = menuItem.TitleFormatted;
+                var sb = new SpannableStringBuilder(title);
+                sb.SetSpan(new CustomTypefaceSpan(fontFamily, fontSizePx, typeface), 0, sb.Length(), SpanTypes.InclusiveInclusive);
+                menuItem.SetTitle(sb);
+            }
+        }
+
+        private float ConvertFontSizeFromDpToPx(double dp)
+        {
+            var density = this.Context.Resources.DisplayMetrics.Density;
+            return (float)(dp * density);
         }
 
         private int GetTabsCount()
@@ -122,7 +168,6 @@ namespace Plugin.TabbedPage.Maui.Platform
                 }
             }
 
-
             if (targetView is not BottomNavigationItemView targetLayout)
             {
                 Trace.WriteLine("Plugin.TabbedPage.Maui: Badge target cannot be null. Badge not added.");
@@ -132,12 +177,7 @@ namespace Plugin.TabbedPage.Maui.Platform
             targetLayout.SetClipChildren(false);
             targetLayout.SetClipToPadding(false);
 
-            // var b = this.bottomNavigationView.GetOrCreateBadge(targetLayout.Id);
-            // b.BadgeTextColor
             var badgeView = targetLayout.FindChildOfType<BadgeView>();
-
-            // var badgeView = targetLayout.Badge;
-
             if (badgeView == null)
             {
                 var imageView = targetLayout.FindChildOfType<ImageView>();
@@ -164,7 +204,6 @@ namespace Plugin.TabbedPage.Maui.Platform
             page.PropertyChanged -= this.OnTabbedPagePropertyChanged;
             page.PropertyChanged += this.OnTabbedPagePropertyChanged;
         }
-
 
         private static IEnumerable<Page> GetChildPages(TabbedPage tabbedPage)
         {
@@ -212,6 +251,12 @@ namespace Plugin.TabbedPage.Maui.Platform
                         tab?.SetText(page.Title);
                     }
                 }
+            }
+            else  if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                      e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName||
+                      e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
+            {
+                this.UpdateFont();
             }
 
             if (this.badgeViews.TryGetValue(element, out var badgeView))
