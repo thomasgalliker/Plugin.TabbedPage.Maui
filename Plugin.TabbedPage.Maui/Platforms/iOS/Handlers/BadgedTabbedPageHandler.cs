@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using CoreFoundation;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
@@ -14,6 +15,7 @@ using TabbedRenderer = Microsoft.Maui.Controls.Handlers.Compatibility.TabbedRend
 namespace Plugin.TabbedPage.Maui.Platform
 {
     using TabbedPageExtensions = Controls.TabbedPage;
+    using TabbedPageExtensionsiOS = Controls.PlatformConfiguration.iOSSpecific;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
 
     [Preserve]
@@ -39,7 +41,8 @@ namespace Plugin.TabbedPage.Maui.Platform
                 this.AddTabBadge(i);
             }
 
-            this.UpdateTabBarAppearance(this.Tabbed);
+            this.UpdateTitleTextAttributes();
+            this.UpdateBadgeBackgroundColor();
 
             this.Tabbed.ChildAdded += this.OnTabAdded;
             this.Tabbed.ChildRemoved += this.OnTabRemoved;
@@ -49,23 +52,91 @@ namespace Plugin.TabbedPage.Maui.Platform
         private void OnTabbedPagePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
-                e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName||
+                e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName ||
                 e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
             {
-                this.UpdateTabBarAppearance(this.Tabbed);
+                this.UpdateTitleTextAttributes();
+            }
+            else if (e.PropertyName == TabbedPageExtensionsiOS.TabbedPage.NormalBadgeBackgroundColorProperty.PropertyName ||
+                     e.PropertyName == TabbedPageExtensionsiOS.TabbedPage.SelectedBadgeBackgroundColorProperty.PropertyName)
+            {
+                this.UpdateBadgeBackgroundColor();
             }
         }
 
-        private void UpdateTabBarAppearance(TabbedPage tabbedPage)
+        private void UpdateBadgeBackgroundColor()
         {
             if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             {
                 return;
             }
 
-            var fontFamily = TabbedPageExtensions.GetFontFamily(tabbedPage);
-            var fontSize = TabbedPageExtensions.GetFontSize(tabbedPage);
-            var fontAttributes = TabbedPageExtensions.GetFontAttributes(tabbedPage);
+            var normalBadgeBackgroundColor = TabbedPageExtensionsiOS.TabbedPage.GetNormalBadgeBackgroundColor(this.Tabbed);
+            var selectedBadgeBackgroundColor = TabbedPageExtensionsiOS.TabbedPage.GetSelectedBadgeBackgroundColor(this.Tabbed);
+
+            if (normalBadgeBackgroundColor.IsDefault() &&
+                selectedBadgeBackgroundColor.IsDefault())
+            {
+                return;
+            }
+
+            var normalBadgeBackground = normalBadgeBackgroundColor.ToPlatform();
+            var selectedBadgeBackground = selectedBadgeBackgroundColor.ToPlatform();
+
+            if (this.TabBar.StandardAppearance is UITabBarAppearance tabBarAppearance)
+            {
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.BadgeBackgroundColor = normalBadgeBackground,
+                    selected => selected.BadgeBackgroundColor = selectedBadgeBackground);
+            }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                if (this.TabBar.ScrollEdgeAppearance is UITabBarAppearance scrollEdgeAppearance)
+                {
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.BadgeBackgroundColor = normalBadgeBackground,
+                        selected => selected.BadgeBackgroundColor = selectedBadgeBackground);
+                }
+            }
+
+            this.TabBar.SetNeedsLayout();
+        }
+
+        private static void UpdateBadgeBackgroundColor(
+            UITabBarAppearance tabBarAppearance,
+            Action<UITabBarItemStateAppearance> normal,
+            Action<UITabBarItemStateAppearance> selected)
+        {
+            if (tabBarAppearance.StackedLayoutAppearance is UITabBarItemAppearance stackedLayoutAppearance)
+            {
+                normal(stackedLayoutAppearance.Normal);
+                selected(stackedLayoutAppearance.Selected);
+            }
+
+            if (tabBarAppearance.InlineLayoutAppearance is UITabBarItemAppearance inlineLayoutAppearance)
+            {
+                normal(inlineLayoutAppearance.Normal);
+                selected(inlineLayoutAppearance.Selected);
+            }
+
+            if (tabBarAppearance.CompactInlineLayoutAppearance is UITabBarItemAppearance compactInlineLayoutAppearance)
+            {
+                normal(compactInlineLayoutAppearance.Normal);
+                selected(compactInlineLayoutAppearance.Selected);
+            }
+        }
+
+        private void UpdateTitleTextAttributes()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                return;
+            }
+
+            var fontFamily = TabbedPageExtensions.GetFontFamily(this.Tabbed);
+            var fontSize = TabbedPageExtensions.GetFontSize(this.Tabbed);
+            var fontAttributes = TabbedPageExtensions.GetFontAttributes(this.Tabbed);
 
             if (Equals(fontFamily, TabbedPageExtensions.FontFamilyProperty.DefaultValue) &&
                 Equals(fontSize, TabbedPageExtensions.FontSizeProperty.DefaultValue) &&
@@ -79,7 +150,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 fontSize,
                 fontAttributes);
 
-            var fontManager = tabbedPage.Handler.GetRequiredService<IFontManager>();
+            var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
             var uiFontNormal = fontManager.GetFont(fontNormal);
 
             if (!fontAttributes.HasFlag(FontAttributes.Bold))
@@ -98,7 +169,9 @@ namespace Plugin.TabbedPage.Maui.Platform
                 }
             }
 
-            var tabBarItemAppearance = new UITabBarItemAppearance();
+            Trace.WriteLine($"UpdateTabBarAppearance: uiFontSelected={uiFontSelected}, uiFontNormal={uiFontNormal}");
+
+            // var tabBarItemAppearance = new UITabBarItemAppearance();
 
             var normalAttributes = new UIStringAttributes
             {
@@ -112,22 +185,24 @@ namespace Plugin.TabbedPage.Maui.Platform
                 //ForegroundColor = UIColor.Magenta,
             };
 
-            tabBarItemAppearance.Normal.TitleTextAttributes = normalAttributes;
-            tabBarItemAppearance.Selected.TitleTextAttributes = selectedAttributes;
-
-            var tabBarAppearance = new UITabBarAppearance
+            if (this.TabBar.StandardAppearance is UITabBarAppearance tabBarAppearance)
             {
-                InlineLayoutAppearance = tabBarItemAppearance,
-                StackedLayoutAppearance = tabBarItemAppearance,
-                CompactInlineLayoutAppearance = tabBarItemAppearance
-            };
-
-            UITabBar.Appearance.StandardAppearance = tabBarAppearance;
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.TitleTextAttributes = normalAttributes,
+                    selected => selected.TitleTextAttributes = selectedAttributes);
+            }
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
             {
-                UITabBar.Appearance.ScrollEdgeAppearance = tabBarAppearance;
+                if (this.TabBar.ScrollEdgeAppearance is UITabBarAppearance scrollEdgeAppearance)
+                {
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.TitleTextAttributes = normalAttributes,
+                        selected => selected.TitleTextAttributes = selectedAttributes);
+                }
             }
+
+            this.TabBar.SetNeedsLayout();
         }
 
         private void AddTabBadge(int tabIndex)
@@ -149,7 +224,7 @@ namespace Plugin.TabbedPage.Maui.Platform
             }
         }
 
-        private void UpdateTitle(UITabBarItem tabBarItem, Page page)
+        private void UpdateTabTitle(UITabBarItem tabBarItem, Page page)
         {
             var text = page.Title;
 
@@ -159,28 +234,28 @@ namespace Plugin.TabbedPage.Maui.Platform
         private void UpdateTabBadgeText(UITabBarItem tabBarItem, Element element)
         {
             var text = TabBadge.GetBadgeText(element);
-
             tabBarItem.BadgeValue = string.IsNullOrEmpty(text) ? null : text;
         }
 
-        private void UpdateTabBadgeTextAttributes(UITabBarItem tabBarItem, Element element)
+        private void UpdateTabBadgeTextAttributes(UITabBarItem tabBarItem, Page page)
         {
-            var attrs = new UIStringAttributes();
+            var stringAttributes = new UIStringAttributes();
 
-            var textColor = TabBadge.GetBadgeTextColor(element);
+            var textColor = TabBadge.GetBadgeTextColor(page);
             if (textColor.IsNotDefault())
             {
-                attrs.ForegroundColor = textColor.ToPlatform();
+                stringAttributes.ForegroundColor = textColor.ToPlatform();
             }
 
-            var font = TabBadge.GetBadgeFont(element);
+            var font = TabBadge.GetBadgeFont(page);
             if (font != Font.Default)
             {
-                attrs.Font = font.ToUIFont((element.Handler ?? Application.Current.Handler).MauiContext.Services
-                    .GetRequiredService<IFontManager>());
+                var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
+                var uiFont = fontManager.GetFont(font);
+                stringAttributes.Font = uiFont;
             }
 
-            tabBarItem.SetBadgeTextAttributes(attrs, UIControlState.Normal);
+            tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
         }
 
         private void UpdateTabBadgeColor(UITabBarItem tabBarItem, Element element)
@@ -205,7 +280,18 @@ namespace Plugin.TabbedPage.Maui.Platform
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTitle(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabTitle(tabBarItem, page);
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        // HACK: This delay is necessary because we want to update the tab font
+                        // after MAUI's TabBar has finished updating the title text.
+                        await Task.Delay(10);
+
+                        var tabBarItem = this.TabBar.Items[tabIndex];
+                        this.UpdateTabBadgeText(tabBarItem, page);
+                    });
                 }
             }
             else if (e.PropertyName == Page.IconImageSourceProperty.PropertyName)
@@ -213,23 +299,26 @@ namespace Plugin.TabbedPage.Maui.Platform
                 // #65 update badge properties if icon changed
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeText(this.TabBar.Items[tabIndex], page);
-                    this.UpdateTabBadgeColor(this.TabBar.Items[tabIndex], page);
-                    this.UpdateTabBadgeTextAttributes(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeText(tabBarItem, page);
+                    this.UpdateTabBadgeColor(tabBarItem, page);
+                    this.UpdateTabBadgeTextAttributes(tabBarItem, page);
                 }
             }
             else if (e.PropertyName == TabBadge.BadgeTextProperty.PropertyName)
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeText(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeText(tabBarItem, page);
                 }
             }
             else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeColor(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeColor(tabBarItem, page);
                 }
             }
             else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName ||
@@ -237,7 +326,8 @@ namespace Plugin.TabbedPage.Maui.Platform
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeTextAttributes(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeTextAttributes(tabBarItem, page);
                 }
             }
         }
@@ -245,7 +335,7 @@ namespace Plugin.TabbedPage.Maui.Platform
         protected bool CheckValidTabIndex(Page page, out int tabIndex)
         {
             tabIndex = this.Tabbed.Children.IndexOf(page);
-            if (tabIndex == -1 && page.Parent != null && page.Parent is Page pageParent)
+            if (tabIndex == -1 && page.Parent is Page pageParent)
             {
                 tabIndex = this.Tabbed.Children.IndexOf(pageParent);
             }

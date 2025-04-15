@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TabbedPageDemoApp.ViewModels;
 
 namespace TabbedPageDemoApp.Views
 {
@@ -11,6 +7,7 @@ namespace TabbedPageDemoApp.Views
         public CarTireAlertPage()
         {
             this.InitializeComponent();
+            this.BindingContext = IPlatformApplication.Current.Services.GetService<CarTireAlertViewModel>();
         }
     }
 }

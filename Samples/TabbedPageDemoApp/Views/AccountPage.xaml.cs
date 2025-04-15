@@ -1,3 +1,5 @@
+using TabbedPageDemoApp.ViewModels;
+
 namespace TabbedPageDemoApp.Views
 {
     public partial class AccountPage : ContentPage
@@ -5,6 +7,7 @@ namespace TabbedPageDemoApp.Views
         public AccountPage()
         {
             this.InitializeComponent();
+            this.BindingContext = IPlatformApplication.Current.Services.GetService<AccountViewModel>();
         }
     }
 }

@@ -48,36 +48,6 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             badgeView.Postion = TabBadge.GetBadgePosition(page);
         }
 
-        public static void UpdateFromPropertyChangedEvent(this BadgeView badgeView, Element element, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == TabBadge.BadgeTextProperty.PropertyName)
-            {
-                badgeView.Text = TabBadge.GetBadgeText(element);
-            }
-            else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
-            {
-                badgeView.BadgeColor = TabBadge.GetBadgeColor(element).ToAndroid();
-            }
-            else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName)
-            {
-                badgeView.TextColor = TabBadge.GetBadgeTextColor(element).ToAndroid();
-            }
-            else if (e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
-            {
-                var fontManager = (element.Handler ?? Application.Current.Handler).MauiContext.Services.GetRequiredService<IFontManager>();
-                badgeView.Typeface = TabBadge.GetBadgeFont(element).ToTypeface(fontManager);
-            }
-            else if (e.PropertyName == TabBadge.BadgePositionProperty.PropertyName)
-            {
-                badgeView.Postion = TabBadge.GetBadgePosition(element);
-            }
-            else if (e.PropertyName == TabBadge.BadgeMarginProperty.PropertyName)
-            {
-                var margin = TabBadge.GetBadgeMargin(element);
-                badgeView.SetMargins((float)margin.Left, (float)margin.Top, (float)margin.Right, (float)margin.Bottom);
-            }
-        }
-
         public static T FindChildOfType<T>(this ViewGroup parent) where T : View
         {
             if (parent == null)

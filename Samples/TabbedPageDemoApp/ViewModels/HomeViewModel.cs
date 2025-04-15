@@ -9,6 +9,7 @@ namespace TabbedPageDemoApp.ViewModels
         private readonly INavigationService navigationService;
         private readonly ILauncher launcher;
 
+        private IRelayCommand appearingCommand;
         private IAsyncRelayCommand<string> navigateToPageCommand;
         private IAsyncRelayCommand<string> openUrlCommand;
         private int? counter;
@@ -19,6 +20,16 @@ namespace TabbedPageDemoApp.ViewModels
         {
             this.navigationService = navigationService;
             this.launcher = launcher;
+        }
+
+        public IRelayCommand AppearingCommand
+        {
+            get => this.appearingCommand ??= new RelayCommand(this.OnAppearing);
+        }
+
+        private void OnAppearing()
+        {
+
         }
 
         public int? Counter

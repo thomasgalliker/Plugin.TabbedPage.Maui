@@ -5,7 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
+    xmlns:ti="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Plugin.TabbedPage.Maui"
     xmlns:views="clr-namespace:TabbedPageDemoApp.Views"
     xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.TabbedMainPage"
@@ -16,36 +18,39 @@
     ios:Page.UseSafeArea="True"
     ios:TabbedPage.TranslucencyMode="Opaque"
     t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"
-    t:TabbedPage.FontSize="16"
+    t:TabbedPage.FontSize="{Binding FontSize}"
+    ti:TabbedPage.NormalBadgeBackgroundColor="{StaticResource Black}"
+    ti:TabbedPage.SelectedBadgeBackgroundColor="{StaticResource Magenta}"
     x:DataType="vm:TabbedMainViewModel">
 
+    <!--  t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"  -->
     <!--  t:TabbedPage.FontFamily="{StaticResource FontFamilyMonospace}"  -->
     <!--  t:TabbedPage.FontSize="16"  -->
     <!--  t:TabbedPage.FontAttributes="Bold"  -->
 
     <NavigationPage
-        Title="Home"
+        Title="{s:Translate TabbedPage_TabHome}"
         IconImageSource="home_outline">
         <x:Arguments>
             <views:HomePage />
         </x:Arguments>
     </NavigationPage>
     <NavigationPage
-        Title="Tire"
+        Title="{s:Translate TabbedPage_TabTireAlert}"
         IconImageSource="car_tire_alert">
         <x:Arguments>
             <views:CarTireAlertPage />
         </x:Arguments>
     </NavigationPage>
     <NavigationPage
-        Title="Chat"
+        Title="{s:Translate TabbedPage_TabChat}"
         IconImageSource="chat_outline">
         <x:Arguments>
             <views:ChatPage />
         </x:Arguments>
     </NavigationPage>
     <NavigationPage
-        Title="Account"
+        Title="{s:Translate TabbedPage_TabAccount}"
         IconImageSource="account_outline">
         <x:Arguments>
             <views:AccountPage />

@@ -116,5 +116,20 @@ namespace Plugin.TabbedPage.Maui.Utils
 
             return element;
         }
+
+        internal static IEnumerable<Page> GetChildPages(TabbedPage tabbedPage)
+        {
+            foreach (var child in tabbedPage.Children)
+            {
+                if (child is NavigationPage navigationPage)
+                {
+                    yield return navigationPage.RootPage;
+                }
+                else
+                {
+                    yield return child;
+                }
+            }
+        }
     }
 }

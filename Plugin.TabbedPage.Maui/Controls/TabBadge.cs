@@ -20,33 +20,51 @@ namespace Plugin.TabbedPage.Maui.Controls
             view.SetValue(BadgeTextProperty, value);
         }
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static readonly BindableProperty BadgeColorProperty = BindableProperty.CreateAttached(
             "BadgeColor",
             typeof(Color),
             typeof(TabBadge),
             null);
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static Color GetBadgeColor(BindableObject view)
         {
             return (Color)view.GetValue(BadgeColorProperty);
         }
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static void SetBadgeColor(BindableObject view, Color value)
         {
             view.SetValue(BadgeColorProperty, value);
         }
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static readonly BindableProperty BadgeTextColorProperty = BindableProperty.CreateAttached(
             "BadgeTextColor",
             typeof(Color),
             typeof(TabBadge),
             null);
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static Color GetBadgeTextColor(BindableObject view)
         {
             return (Color)view.GetValue(BadgeTextColorProperty);
         }
 
+        /// <summary>
+        /// Works on Android only!
+        /// </summary>
         public static void SetBadgeTextColor(BindableObject view, Color value)
         {
             view.SetValue(BadgeTextColorProperty, value);

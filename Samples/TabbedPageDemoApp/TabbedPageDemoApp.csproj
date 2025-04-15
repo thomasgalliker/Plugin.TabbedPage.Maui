@@ -101,6 +101,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="Sentry.Extensions.Logging" Version="4.8.1" />
+		<PackageReference Include="Superdev.Maui" Version="1.0.60-pre" />
 		<PackageReference Include="ValueConverters.MAUI" Version="3.0.26" />
 	</ItemGroup>
 

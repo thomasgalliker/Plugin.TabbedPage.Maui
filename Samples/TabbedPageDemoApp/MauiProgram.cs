@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Plugin.TabbedPage.Maui;
+using Superdev.Maui;
+using Superdev.Maui.Localization;
+using TabbedPageDemoApp.Resources.Text;
 using TabbedPageDemoApp.Services;
 using TabbedPageDemoApp.Services.Logging;
 using TabbedPageDemoApp.ViewModels;
@@ -17,6 +20,7 @@ namespace TabbedPageDemoApp
                 .UseMauiApp<App>()
                 .UseTabbedPage()
                 .UseMauiCommunityToolkit()
+                .UseSuperdevMaui()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -26,7 +30,6 @@ namespace TabbedPageDemoApp
                     fonts.AddFont("IBMPlexMono-Regular.ttf", "IBMPlexMonoRegular");
                 });
 
-
             builder.Services.AddLogging(b =>
             {
                 b.ClearProviders();
@@ -34,6 +37,11 @@ namespace TabbedPageDemoApp
                 b.AddDebug();
                 b.AddSentry(SentryConfiguration.Configure);
             });
+
+            var translationProvider = ResxSingleTranslationProvider.Current;
+            translationProvider.Init(Strings.ResourceManager);
+
+            TranslateExtension.Init(Localizer.Current, translationProvider);
 
             // Register services
             builder.Services.AddSingleton<INavigationService, MauiNavigationService>();
@@ -48,8 +56,13 @@ namespace TabbedPageDemoApp
             builder.Services.AddTransient<HomeViewModel>();
 
             builder.Services.AddTransient<CarTireAlertPage>();
-            builder.Services.AddTransient<AccountPage>();
+            builder.Services.AddTransient<CarTireAlertViewModel>();
+
             builder.Services.AddTransient<ChatPage>();
+            builder.Services.AddTransient<ChatViewModel>();
+
+            builder.Services.AddTransient<AccountPage>();
+            builder.Services.AddTransient<AccountViewModel>();
 
             return builder.Build();
         }
