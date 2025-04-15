@@ -239,32 +239,32 @@ namespace Plugin.TabbedPage.Maui.Platform
 
         private void UpdateTabBadgeTextAttributes(UITabBarItem tabBarItem, Page page)
         {
-            var stringAttributes = new UIStringAttributes();
-
-            var textColor = TabBadge.GetBadgeTextColor(page);
-            if (textColor.IsNotDefault())
-            {
-                stringAttributes.ForegroundColor = textColor.ToPlatform();
-            }
-
-            var font = TabBadge.GetBadgeFont(page);
-            if (font != Font.Default)
-            {
-                var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
-                var uiFont = fontManager.GetFont(font);
-                stringAttributes.Font = uiFont;
-            }
-
-            tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
+            // var stringAttributes = new UIStringAttributes();
+            //
+            // var textColor = TabBadge.GetBadgeTextColor(page);
+            // if (textColor.IsNotDefault())
+            // {
+            //     stringAttributes.ForegroundColor = textColor.ToPlatform();
+            // }
+            //
+            // var font = TabBadge.GetBadgeFont(page);
+            // if (font != Font.Default)
+            // {
+            //     var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
+            //     var uiFont = fontManager.GetFont(font);
+            //     stringAttributes.Font = uiFont;
+            // }
+            //
+            // tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
         }
 
         private void UpdateTabBadgeColor(UITabBarItem tabBarItem, Element element)
         {
-            var tabColor = TabBadge.GetBadgeColor(element);
-            if (tabColor.IsNotDefault())
-            {
-                tabBarItem.BadgeColor = tabColor.ToPlatform();
-            }
+            // var tabColor = TabBadge.GetBadgeColor(element);
+            // if (tabColor.IsNotDefault())
+            // {
+            //     tabBarItem.BadgeColor = tabColor.ToPlatform();
+            // }
         }
 
         private void OnPagePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -313,23 +313,23 @@ namespace Plugin.TabbedPage.Maui.Platform
                     this.UpdateTabBadgeText(tabBarItem, page);
                 }
             }
-            else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
-            {
-                if (this.CheckValidTabIndex(page, out var tabIndex))
-                {
-                    var tabBarItem = this.TabBar.Items[tabIndex];
-                    this.UpdateTabBadgeColor(tabBarItem, page);
-                }
-            }
-            else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName ||
-                     e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
-            {
-                if (this.CheckValidTabIndex(page, out var tabIndex))
-                {
-                    var tabBarItem = this.TabBar.Items[tabIndex];
-                    this.UpdateTabBadgeTextAttributes(tabBarItem, page);
-                }
-            }
+            // else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
+            // {
+            //     if (this.CheckValidTabIndex(page, out var tabIndex))
+            //     {
+            //         var tabBarItem = this.TabBar.Items[tabIndex];
+            //         this.UpdateTabBadgeColor(tabBarItem, page);
+            //     }
+            // }
+            // else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName ||
+            //          e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
+            // {
+            //     if (this.CheckValidTabIndex(page, out var tabIndex))
+            //     {
+            //         var tabBarItem = this.TabBar.Items[tabIndex];
+            //         this.UpdateTabBadgeTextAttributes(tabBarItem, page);
+            //     }
+            // }
         }
 
         protected bool CheckValidTabIndex(Page page, out int tabIndex)

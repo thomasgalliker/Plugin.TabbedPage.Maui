@@ -23,6 +23,8 @@ namespace Plugin.TabbedPage.Maui.Platform
 {
     using TabbedPageExtensions = Controls.TabbedPage;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
+    using TabBadgeExtensionsAndroid = Controls.PlatformConfiguration.AndroidSpecific.TabBadge;
+
 
     public class BadgedTabbedPageHandler : TabbedViewHandler
     {
@@ -287,19 +289,19 @@ namespace Plugin.TabbedPage.Maui.Platform
                 {
                     badgeView.Text = TabBadge.GetBadgeText(page);
                 }
-                else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
+                else if (e.PropertyName == TabBadgeExtensionsAndroid.BadgeColorProperty.PropertyName)
                 {
-                    var badgeColor = TabBadge.GetBadgeColor(page);
+                    var badgeColor = TabBadgeExtensionsAndroid.GetBadgeColor(page);
                     badgeView.BadgeColor = badgeColor.ToPlatform();
                 }
-                else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName)
+                else if (e.PropertyName == TabBadgeExtensionsAndroid.BadgeTextColorProperty.PropertyName)
                 {
-                    var badgeTextColor = TabBadge.GetBadgeTextColor(page);
+                    var badgeTextColor = TabBadgeExtensionsAndroid.GetBadgeTextColor(page);
                     badgeView.TextColor = badgeTextColor.ToPlatform();
                 }
                 else if (e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
                 {
-                    var fontManager = (page.Handler ?? Application.Current.Handler).MauiContext.Services.GetRequiredService<IFontManager>();
+                    var fontManager = page.Handler.GetRequiredService<IFontManager>();
                     var badgeFont = TabBadge.GetBadgeFont(page);
                     badgeView.Typeface = badgeFont.ToTypeface(fontManager);
                 }

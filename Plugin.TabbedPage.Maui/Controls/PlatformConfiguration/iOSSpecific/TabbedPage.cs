@@ -1,5 +1,8 @@
 namespace Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.iOSSpecific
 {
+    /// <summary>
+    /// iOS-specific tabbed page configuration
+    /// </summary>
     public static class TabbedPage
     {
         public static readonly BindableProperty NormalBadgeBackgroundColorProperty = BindableProperty.CreateAttached(

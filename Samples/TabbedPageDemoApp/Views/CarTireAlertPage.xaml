@@ -6,13 +6,14 @@
     xmlns:controls="clr-namespace:TabbedPageDemoApp.Controls"
     xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
+    xmlns:ta="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Plugin.TabbedPage.Maui"
     xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.CarTireAlertPage"
     Title="{s:Translate CarTireAlertPage_Title}"
-    t:TabBadge.BadgeColor="{Binding BadgeColor}"
     t:TabBadge.BadgePosition="{Binding BadgePosition}"
     t:TabBadge.BadgeText="{Binding BadgeText}"
-    t:TabBadge.BadgeTextColor="{Binding BadgeTextColor}"
+    ta:TabBadge.BadgeColor="{Binding BadgeColor}"
+    ta:TabBadge.BadgeTextColor="{Binding BadgeTextColor}"
     x:DataType="vm:CarTireAlertViewModel">
 
     <ScrollView>

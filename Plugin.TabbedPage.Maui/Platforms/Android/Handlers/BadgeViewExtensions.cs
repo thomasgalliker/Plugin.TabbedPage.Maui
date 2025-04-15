@@ -11,6 +11,8 @@ using View = Android.Views.View;
 
 namespace Plugin.TabbedPage.Maui.Platform.Handlers
 {
+    using TabBadgeExtensionsAndroid = Controls.PlatformConfiguration.AndroidSpecific.TabBadge;
+
     internal static class BadgeViewExtensions
     {
         public static void UpdateFromElement(this BadgeView badgeView, Page page)
@@ -20,14 +22,14 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             badgeView.Text = badgeText;
 
             // set color if not default
-            var tabColor = TabBadge.GetBadgeColor(page);
+            var tabColor = TabBadgeExtensionsAndroid.GetBadgeColor(page);
             if (tabColor.IsNotDefault())
             {
                 badgeView.BadgeColor = tabColor.ToPlatform();
             }
 
             // set text color if not default
-            var tabTextColor = TabBadge.GetBadgeTextColor(page);
+            var tabTextColor = TabBadgeExtensionsAndroid.GetBadgeTextColor(page);
             if (tabTextColor.IsNotDefault())
             {
                 badgeView.TextColor = tabTextColor.ToPlatform();
@@ -37,8 +39,8 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             var font = TabBadge.GetBadgeFont(page);
             if (font != Font.Default)
             {
-                badgeView.Typeface = font.ToTypeface((page.Handler ?? Application.Current.Handler).MauiContext.Services
-                    .GetRequiredService<IFontManager>());
+                var fontManager = page.Handler.GetRequiredService<IFontManager>();
+                badgeView.Typeface = fontManager.GetTypeface(font);
             }
 
             var margin = TabBadge.GetBadgeMargin(page);

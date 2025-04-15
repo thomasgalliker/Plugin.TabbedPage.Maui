@@ -6,12 +6,13 @@
     xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
+    xmlns:ta="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Plugin.TabbedPage.Maui"
     xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.HomePage"
     Title="{s:Translate HomePage_Title}"
-    t:TabBadge.BadgeColor="Aqua"
     t:TabBadge.BadgeText="{Binding Counter}"
-    t:TabBadge.BadgeTextColor="Orange"
+    ta:TabBadge.BadgeColor="{StaticResource Primary}"
+    ta:TabBadge.BadgeTextColor="{StaticResource White}"
     x:DataType="vm:HomeViewModel">
 
     <ContentPage.Behaviors>

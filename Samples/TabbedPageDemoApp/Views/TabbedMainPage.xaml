@@ -19,8 +19,8 @@
     ios:TabbedPage.TranslucencyMode="Opaque"
     t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"
     t:TabbedPage.FontSize="{Binding FontSize}"
-    ti:TabbedPage.NormalBadgeBackgroundColor="{StaticResource Black}"
-    ti:TabbedPage.SelectedBadgeBackgroundColor="{StaticResource Magenta}"
+    ti:TabbedPage.NormalBadgeBackgroundColor="{StaticResource Primary}"
+    ti:TabbedPage.SelectedBadgeBackgroundColor="{StaticResource Gray500}"
     x:DataType="vm:TabbedMainViewModel">
 
     <!--  t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"  -->
