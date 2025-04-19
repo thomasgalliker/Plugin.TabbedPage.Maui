@@ -171,18 +171,41 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             Trace.WriteLine($"UpdateTabBarAppearance: uiFontSelected={uiFontSelected}, uiFontNormal={uiFontNormal}");
 
-            // var tabBarItemAppearance = new UITabBarItemAppearance();
+            var unselectedTabColor = this.Tabbed.UnselectedTabColor;
+
+            var barTextColor = this.Tabbed.BarTextColor;
+
+            var selectedTabColor = this.Tabbed.SelectedTabColor;
+            if (selectedTabColor.IsDefault())
+            {
+                selectedTabColor = unselectedTabColor;
+            }
+
+            var barTextUiColor = barTextColor?.ToPlatform();
+            var unselectedTabUiColor = unselectedTabColor?.ToPlatform();
+            var selectedTabUiColor = selectedTabColor?.ToPlatform();
+
+            var normalTextColor = barTextUiColor ?? unselectedTabUiColor;
+            var selectedTextColor = barTextUiColor ?? selectedTabUiColor;
+
+            var normalIconColor = unselectedTabUiColor;
+            var selectedIconColor = selectedTabUiColor;
+
+            Trace.WriteLine(
+                $"UpdateTabBarAppearance: " +
+                $"normalTextColor={normalTextColor}, selectedTextColor={selectedTextColor}, " +
+                $"normalIconColor={normalIconColor}, selectedIconColor={selectedIconColor}");
 
             var normalAttributes = new UIStringAttributes
             {
                 Font = uiFontNormal,
-                //ForegroundColor = UIColor.Green,
+                ForegroundColor = normalTextColor
             };
 
             var selectedAttributes = new UIStringAttributes
             {
                 Font = uiFontSelected,
-                //ForegroundColor = UIColor.Magenta,
+                ForegroundColor = selectedTextColor
             };
 
             if (this.TabBar.StandardAppearance is UITabBarAppearance tabBarAppearance)
@@ -190,6 +213,10 @@ namespace Plugin.TabbedPage.Maui.Platform
                 UpdateBadgeBackgroundColor(tabBarAppearance,
                     normal => normal.TitleTextAttributes = normalAttributes,
                     selected => selected.TitleTextAttributes = selectedAttributes);
+
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.IconColor =  normalIconColor,
+                    selected => selected.IconColor = selectedIconColor);
             }
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
@@ -199,6 +226,11 @@ namespace Plugin.TabbedPage.Maui.Platform
                     UpdateBadgeBackgroundColor(scrollEdgeAppearance,
                         normal => normal.TitleTextAttributes = normalAttributes,
                         selected => selected.TitleTextAttributes = selectedAttributes);
+
+
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.IconColor = normalIconColor,
+                        selected => selected.IconColor = selectedIconColor);
                 }
             }
 
