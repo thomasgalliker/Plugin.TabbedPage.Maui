@@ -1,7 +1,12 @@
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
+using CoreFoundation;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
+using Plugin.TabbedPage.Maui.Extensions;
+using Plugin.TabbedPage.Maui.Utils;
 using UIKit;
 using Font = Microsoft.Maui.Font;
 using Page = Microsoft.Maui.Controls.Page;
@@ -9,6 +14,8 @@ using TabbedRenderer = Microsoft.Maui.Controls.Handlers.Compatibility.TabbedRend
 
 namespace Plugin.TabbedPage.Maui.Platform
 {
+    using TabbedPageExtensions = Controls.TabbedPage;
+    using TabbedPageExtensionsiOS = Controls.PlatformConfiguration.iOSSpecific;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
 
     [Preserve]
@@ -34,8 +41,200 @@ namespace Plugin.TabbedPage.Maui.Platform
                 this.AddTabBadge(i);
             }
 
+            this.UpdateTitleTextAttributes();
+            this.UpdateBadgeBackgroundColor();
+
             this.Tabbed.ChildAdded += this.OnTabAdded;
             this.Tabbed.ChildRemoved += this.OnTabRemoved;
+            this.Tabbed.PropertyChanged += this.OnTabbedPagePropertyChanged;
+        }
+
+        private void OnTabbedPagePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName ||
+                e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
+            {
+                this.UpdateTitleTextAttributes();
+            }
+            else if (e.PropertyName == TabbedPageExtensionsiOS.TabbedPage.NormalBadgeBackgroundColorProperty.PropertyName ||
+                     e.PropertyName == TabbedPageExtensionsiOS.TabbedPage.SelectedBadgeBackgroundColorProperty.PropertyName)
+            {
+                this.UpdateBadgeBackgroundColor();
+            }
+        }
+
+        private void UpdateBadgeBackgroundColor()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                return;
+            }
+
+            var normalBadgeBackgroundColor = TabbedPageExtensionsiOS.TabbedPage.GetNormalBadgeBackgroundColor(this.Tabbed);
+            var selectedBadgeBackgroundColor = TabbedPageExtensionsiOS.TabbedPage.GetSelectedBadgeBackgroundColor(this.Tabbed);
+
+            if (normalBadgeBackgroundColor.IsDefault() &&
+                selectedBadgeBackgroundColor.IsDefault())
+            {
+                return;
+            }
+
+            var normalBadgeBackground = normalBadgeBackgroundColor.ToPlatform();
+            var selectedBadgeBackground = selectedBadgeBackgroundColor.ToPlatform();
+
+            if (this.TabBar.StandardAppearance is UITabBarAppearance tabBarAppearance)
+            {
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.BadgeBackgroundColor = normalBadgeBackground,
+                    selected => selected.BadgeBackgroundColor = selectedBadgeBackground);
+            }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                if (this.TabBar.ScrollEdgeAppearance is UITabBarAppearance scrollEdgeAppearance)
+                {
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.BadgeBackgroundColor = normalBadgeBackground,
+                        selected => selected.BadgeBackgroundColor = selectedBadgeBackground);
+                }
+            }
+
+            this.TabBar.SetNeedsLayout();
+        }
+
+        private static void UpdateBadgeBackgroundColor(
+            UITabBarAppearance tabBarAppearance,
+            Action<UITabBarItemStateAppearance> normal,
+            Action<UITabBarItemStateAppearance> selected)
+        {
+            if (tabBarAppearance.StackedLayoutAppearance is UITabBarItemAppearance stackedLayoutAppearance)
+            {
+                normal(stackedLayoutAppearance.Normal);
+                selected(stackedLayoutAppearance.Selected);
+            }
+
+            if (tabBarAppearance.InlineLayoutAppearance is UITabBarItemAppearance inlineLayoutAppearance)
+            {
+                normal(inlineLayoutAppearance.Normal);
+                selected(inlineLayoutAppearance.Selected);
+            }
+
+            if (tabBarAppearance.CompactInlineLayoutAppearance is UITabBarItemAppearance compactInlineLayoutAppearance)
+            {
+                normal(compactInlineLayoutAppearance.Normal);
+                selected(compactInlineLayoutAppearance.Selected);
+            }
+        }
+
+        private void UpdateTitleTextAttributes()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                return;
+            }
+
+            var fontFamily = TabbedPageExtensions.GetFontFamily(this.Tabbed);
+            var fontSize = TabbedPageExtensions.GetFontSize(this.Tabbed);
+            var fontAttributes = TabbedPageExtensions.GetFontAttributes(this.Tabbed);
+
+            if (Equals(fontFamily, TabbedPageExtensions.FontFamilyProperty.DefaultValue) &&
+                Equals(fontSize, TabbedPageExtensions.FontSizeProperty.DefaultValue) &&
+                Equals(fontAttributes, TabbedPageExtensions.FontAttributesProperty.DefaultValue))
+            {
+                return;
+            }
+
+            var fontNormal = FontHelper.CreateFont(
+                fontFamily,
+                fontSize,
+                fontAttributes);
+
+            var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
+            var uiFontNormal = fontManager.GetFont(fontNormal);
+
+            if (!fontAttributes.HasFlag(FontAttributes.Bold))
+            {
+                fontNormal = fontNormal.WithWeight(FontWeight.Medium);
+            }
+
+            var uiFontSelected = fontManager.GetFont(fontNormal);
+
+            if (fontFamily != null)
+            {
+                var fontDescriptor = uiFontSelected.FontDescriptor.CreateWithTraits(UIFontDescriptorSymbolicTraits.Bold);
+                if (fontDescriptor != null)
+                {
+                    uiFontSelected = UIFont.FromDescriptor(fontDescriptor, 0.0f); // 0.0f - keep the same size
+                }
+            }
+
+            Trace.WriteLine($"UpdateTabBarAppearance: uiFontSelected={uiFontSelected}, uiFontNormal={uiFontNormal}");
+
+            var unselectedTabColor = this.Tabbed.UnselectedTabColor;
+
+            var barTextColor = this.Tabbed.BarTextColor;
+
+            var selectedTabColor = this.Tabbed.SelectedTabColor;
+            if (selectedTabColor.IsDefault())
+            {
+                selectedTabColor = unselectedTabColor;
+            }
+
+            var barTextUiColor = barTextColor?.ToPlatform();
+            var unselectedTabUiColor = unselectedTabColor?.ToPlatform();
+            var selectedTabUiColor = selectedTabColor?.ToPlatform();
+
+            var normalTextColor = barTextUiColor ?? unselectedTabUiColor;
+            var selectedTextColor = barTextUiColor ?? selectedTabUiColor;
+
+            var normalIconColor = unselectedTabUiColor;
+            var selectedIconColor = selectedTabUiColor;
+
+            Trace.WriteLine(
+                $"UpdateTabBarAppearance: " +
+                $"normalTextColor={normalTextColor}, selectedTextColor={selectedTextColor}, " +
+                $"normalIconColor={normalIconColor}, selectedIconColor={selectedIconColor}");
+
+            var normalAttributes = new UIStringAttributes
+            {
+                Font = uiFontNormal,
+                ForegroundColor = normalTextColor
+            };
+
+            var selectedAttributes = new UIStringAttributes
+            {
+                Font = uiFontSelected,
+                ForegroundColor = selectedTextColor
+            };
+
+            if (this.TabBar.StandardAppearance is UITabBarAppearance tabBarAppearance)
+            {
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.TitleTextAttributes = normalAttributes,
+                    selected => selected.TitleTextAttributes = selectedAttributes);
+
+                UpdateBadgeBackgroundColor(tabBarAppearance,
+                    normal => normal.IconColor =  normalIconColor,
+                    selected => selected.IconColor = selectedIconColor);
+            }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                if (this.TabBar.ScrollEdgeAppearance is UITabBarAppearance scrollEdgeAppearance)
+                {
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.TitleTextAttributes = normalAttributes,
+                        selected => selected.TitleTextAttributes = selectedAttributes);
+
+
+                    UpdateBadgeBackgroundColor(scrollEdgeAppearance,
+                        normal => normal.IconColor = normalIconColor,
+                        selected => selected.IconColor = selectedIconColor);
+                }
+            }
+
+            this.TabBar.SetNeedsLayout();
         }
 
         private void AddTabBadge(int tabIndex)
@@ -45,19 +244,19 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            var element = this.Tabbed.GetChildPageWithBadge(tabIndex);
-            element.PropertyChanged += this.OnTabbedPagePropertyChanged;
+            var page = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
+            page.PropertyChanged += this.OnPagePropertyChanged;
 
             if (this.TabBar.Items.Length > tabIndex)
             {
                 var tabBarItem = this.TabBar.Items[tabIndex];
-                this.UpdateTabBadgeText(tabBarItem, element);
-                this.UpdateTabBadgeColor(tabBarItem, element);
-                this.UpdateTabBadgeTextAttributes(tabBarItem, element);
+                this.UpdateTabBadgeText(tabBarItem, page);
+                this.UpdateTabBadgeColor(tabBarItem, page);
+                this.UpdateTabBadgeTextAttributes(tabBarItem, page);
             }
         }
 
-        private void UpdateTitle(UITabBarItem tabBarItem, Page page)
+        private void UpdateTabTitle(UITabBarItem tabBarItem, Page page)
         {
             var text = page.Title;
 
@@ -67,41 +266,43 @@ namespace Plugin.TabbedPage.Maui.Platform
         private void UpdateTabBadgeText(UITabBarItem tabBarItem, Element element)
         {
             var text = TabBadge.GetBadgeText(element);
-
             tabBarItem.BadgeValue = string.IsNullOrEmpty(text) ? null : text;
         }
 
-        private void UpdateTabBadgeTextAttributes(UITabBarItem tabBarItem, Element element)
+        private void UpdateTabBadgeTextAttributes(UITabBarItem tabBarItem, Page page)
         {
-            var attrs = new UIStringAttributes();
-
-            var textColor = TabBadge.GetBadgeTextColor(element);
-            if (textColor.IsNotDefault())
-            {
-                attrs.ForegroundColor = textColor.ToPlatform();
-            }
-
-            var font = TabBadge.GetBadgeFont(element);
-            if (font != Font.Default)
-            {
-                attrs.Font = font.ToUIFont((element.Handler ?? Application.Current.Handler).MauiContext.Services
-                    .GetRequiredService<IFontManager>());
-            }
-
-            tabBarItem.SetBadgeTextAttributes(attrs, UIControlState.Normal);
+            // var stringAttributes = new UIStringAttributes();
+            //
+            // var textColor = TabBadge.GetBadgeTextColor(page);
+            // if (textColor.IsNotDefault())
+            // {
+            //     stringAttributes.ForegroundColor = textColor.ToPlatform();
+            // }
+            //
+            // var font = TabBadge.GetBadgeFont(page);
+            // if (font != Font.Default)
+            // {
+            //     var fontManager = this.Tabbed.Handler.GetRequiredService<IFontManager>();
+            //     var uiFont = fontManager.GetFont(font);
+            //     stringAttributes.Font = uiFont;
+            // }
+            //
+            // tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
         }
 
         private void UpdateTabBadgeColor(UITabBarItem tabBarItem, Element element)
         {
-            var tabColor = TabBadge.GetBadgeColor(element);
-            if (tabColor.IsNotDefault())
-            {
-                tabBarItem.BadgeColor = tabColor.ToPlatform();
-            }
+            // var tabColor = TabBadge.GetBadgeColor(element);
+            // if (tabColor.IsNotDefault())
+            // {
+            //     tabBarItem.BadgeColor = tabColor.ToPlatform();
+            // }
         }
 
-        private void OnTabbedPagePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnPagePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            Trace.WriteLine($"OnPagePropertyChanged: {e.PropertyName}");
+
             if (sender is not Page page)
             {
                 return;
@@ -111,7 +312,18 @@ namespace Plugin.TabbedPage.Maui.Platform
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTitle(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabTitle(tabBarItem, page);
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        // HACK: This delay is necessary because we want to update the tab font
+                        // after MAUI's TabBar has finished updating the title text.
+                        await Task.Delay(10);
+
+                        var tabBarItem = this.TabBar.Items[tabIndex];
+                        this.UpdateTabBadgeText(tabBarItem, page);
+                    });
                 }
             }
             else if (e.PropertyName == Page.IconImageSourceProperty.PropertyName)
@@ -119,39 +331,43 @@ namespace Plugin.TabbedPage.Maui.Platform
                 // #65 update badge properties if icon changed
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeText(this.TabBar.Items[tabIndex], page);
-                    this.UpdateTabBadgeColor(this.TabBar.Items[tabIndex], page);
-                    this.UpdateTabBadgeTextAttributes(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeText(tabBarItem, page);
+                    this.UpdateTabBadgeColor(tabBarItem, page);
+                    this.UpdateTabBadgeTextAttributes(tabBarItem, page);
                 }
             }
             else if (e.PropertyName == TabBadge.BadgeTextProperty.PropertyName)
             {
                 if (this.CheckValidTabIndex(page, out var tabIndex))
                 {
-                    this.UpdateTabBadgeText(this.TabBar.Items[tabIndex], page);
+                    var tabBarItem = this.TabBar.Items[tabIndex];
+                    this.UpdateTabBadgeText(tabBarItem, page);
                 }
             }
-            else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
-            {
-                if (this.CheckValidTabIndex(page, out var tabIndex))
-                {
-                    this.UpdateTabBadgeColor(this.TabBar.Items[tabIndex], page);
-                }
-            }
-            else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName ||
-                     e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
-            {
-                if (this.CheckValidTabIndex(page, out var tabIndex))
-                {
-                    this.UpdateTabBadgeTextAttributes(this.TabBar.Items[tabIndex], page);
-                }
-            }
+            // else if (e.PropertyName == TabBadge.BadgeColorProperty.PropertyName)
+            // {
+            //     if (this.CheckValidTabIndex(page, out var tabIndex))
+            //     {
+            //         var tabBarItem = this.TabBar.Items[tabIndex];
+            //         this.UpdateTabBadgeColor(tabBarItem, page);
+            //     }
+            // }
+            // else if (e.PropertyName == TabBadge.BadgeTextColorProperty.PropertyName ||
+            //          e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
+            // {
+            //     if (this.CheckValidTabIndex(page, out var tabIndex))
+            //     {
+            //         var tabBarItem = this.TabBar.Items[tabIndex];
+            //         this.UpdateTabBadgeTextAttributes(tabBarItem, page);
+            //     }
+            // }
         }
 
         protected bool CheckValidTabIndex(Page page, out int tabIndex)
         {
             tabIndex = this.Tabbed.Children.IndexOf(page);
-            if (tabIndex == -1 && page.Parent != null && page.Parent is Page pageParent)
+            if (tabIndex == -1 && page.Parent is Page pageParent)
             {
                 tabIndex = this.Tabbed.Children.IndexOf(pageParent);
             }
@@ -175,7 +391,7 @@ namespace Plugin.TabbedPage.Maui.Platform
 
         private void OnTabRemoved(object sender, ElementEventArgs e)
         {
-            e.Element.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+            e.Element.PropertyChanged -= this.OnPagePropertyChanged;
         }
 
         protected override void Dispose(bool disposing)
@@ -192,13 +408,14 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            foreach (var tab in tabbedPage.Children.Select(c => c.GetPageWithBadge()))
+            foreach (var page in tabbedPage.Children.Select(PageHelper.GetPageWithBadge))
             {
-                tab.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+                page.PropertyChanged -= this.OnPagePropertyChanged;
             }
 
             tabbedPage.ChildAdded -= this.OnTabAdded;
             tabbedPage.ChildRemoved -= this.OnTabRemoved;
+            tabbedPage.PropertyChanged -= this.OnTabbedPagePropertyChanged;
         }
     }
 }

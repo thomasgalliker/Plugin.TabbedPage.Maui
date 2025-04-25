@@ -16,7 +16,7 @@
                 Value="Courier" />
         </OnPlatform.Platforms>
     </OnPlatform>
-    
+
     <OnPlatform
         x:Key="FontFamilySerif"
         x:TypeArguments="x:String">
@@ -29,5 +29,9 @@
                 Value="Times New Roman" />
         </OnPlatform.Platforms>
     </OnPlatform>
+
+    <x:String x:Key="FontFamily.IBMPlexSans.Medium">IBMPlexSans</x:String>
+    <x:String x:Key="FontFamily.IBMPlexSans.Bold">IBMPlexSansBold</x:String>
+    <x:String x:Key="FontFamily.IBMPlexMono.Regular">IBMPlexMonoRegular</x:String>
 
 </ResourceDictionary>

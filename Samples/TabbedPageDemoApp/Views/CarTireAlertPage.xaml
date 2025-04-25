@@ -3,9 +3,85 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="http://plugin.tabbedpage.maui"
+    xmlns:controls="clr-namespace:TabbedPageDemoApp.Controls"
+    xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
+    xmlns:t="http://plugin.tabbedpage.maui"
+    xmlns:ta="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Plugin.TabbedPage.Maui"
+    xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.CarTireAlertPage"
-    Title="CarTireAlertPage"
-    controls:TabBadge.BadgeText="!">
-    <ContentPage.Content />
+    Title="{s:Translate CarTireAlertPage_Title}"
+    t:TabBadge.BadgePosition="{Binding BadgePosition}"
+    t:TabBadge.BadgeText="{Binding BadgeText}"
+    ta:TabBadge.BadgeColor="{Binding BadgeColor}"
+    ta:TabBadge.BadgeTextColor="{Binding BadgeTextColor}"
+    x:DataType="vm:CarTireAlertViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="16"
+            Spacing="16">
+
+            <Label
+                Style="{StaticResource Heading2LabelStyle}"
+                Text="TabbedPage Features" />
+
+            <VerticalStackLayout>
+                <Label Text="FontSize" />
+                <Grid
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="16">
+                    <Entry
+                        Grid.Column="0"
+                        Keyboard="Numeric"
+                        Placeholder="FontSize"
+                        Text="{Binding FontSize}" />
+                    <Stepper
+                        Grid.Column="1"
+                        Value="{Binding FontSize}"
+                        VerticalOptions="Center" />
+                </Grid>
+
+            </VerticalStackLayout>
+
+            <controls:DividerLine />
+
+            <Label
+                Style="{StaticResource Heading2LabelStyle}"
+                Text="TabBadge Features" />
+
+            <VerticalStackLayout>
+                <Label Text="BadgeText" />
+                <Entry
+                    Placeholder="BadgeText"
+                    Text="{Binding BadgeText}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="BadgePosition" />
+                <s:CustomPicker
+                    Title="BadgePosition"
+                    ItemDisplayBinding="{Binding .}"
+                    ItemsSource="{Binding BadgePositions}"
+                    SelectedItem="{Binding BadgePosition}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="BadgeColor (Android only)" />
+                <s:CustomPicker
+                    Title="BadgeColor"
+                    ItemDisplayBinding="{Binding .}"
+                    ItemsSource="{Binding BadgeColors}"
+                    SelectedItem="{Binding BadgeColor}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="BadgeTextColor (Android only)" />
+                <s:CustomPicker
+                    Title="BadgeTextColor"
+                    ItemDisplayBinding="{Binding .}"
+                    ItemsSource="{Binding BadgeTextColors}"
+                    SelectedItem="{Binding BadgeTextColor}" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

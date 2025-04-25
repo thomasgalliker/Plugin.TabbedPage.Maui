@@ -407,18 +407,25 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray600}}" />
     </Style>
-    
+
     <Style TargetType="NavigationPage">
         <Setter Property="BarBackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
         <Setter Property="BarTextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
         <Setter Property="IconColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
     </Style>
 
-    <Style TargetType="TabbedPage">
-        <Setter Property="BarBackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
-        <Setter Property="BarTextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-        <Setter Property="UnselectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
-        <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
+    <Style
+        ApplyToDerivedTypes="True"
+        TargetType="TabbedPage">
+        <Setter Property="BarBackgroundColor" Value="{StaticResource Gray100}" />
+        <Setter Property="UnselectedTabColor" Value="{StaticResource Gray500}" />
+        <Setter Property="SelectedTabColor" Value="{StaticResource Primary}" />
+
+        <!--  Use these values for debugging  -->
+        <!-- <Setter Property="BarBackgroundColor" Value="White" /> -->
+        <!-- <Setter Property="BarTextColor" Value="Red" /> -->
+        <!-- <Setter Property="UnselectedTabColor" Value="Green" /> -->
+        <!-- <Setter Property="SelectedTabColor" Value="Blue" /> -->
     </Style>
 
 </ResourceDictionary>

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Android.Views;
 using Android.Widget;
 using Google.Android.Material.BottomNavigation;
@@ -9,19 +10,27 @@ using Page = Microsoft.Maui.Controls.Page;
 using AView = global::Android.Views.View;
 using View = Android.Views.View;
 using Plugin.TabbedPage.Maui.Utils;
-using Plugin.TabbedPage.Maui.Controls;
 using System.Diagnostics;
+using Android.Text;
+using Android.Text.Style;
+using Microsoft.Maui.Platform;
+using Plugin.TabbedPage.Maui.Extensions;
+using Plugin.TabbedPage.Maui.Controls;
 using Plugin.TabbedPage.Maui.Platform.Handlers;
+using Application = Microsoft.Maui.Controls.Application;
 
 namespace Plugin.TabbedPage.Maui.Platform
 {
+    using TabbedPageExtensions = Controls.TabbedPage;
     using TabbedPage = Microsoft.Maui.Controls.TabbedPage;
+    using TabBadgeExtensionsAndroid = Controls.PlatformConfiguration.AndroidSpecific.TabBadge;
+
 
     public class BadgedTabbedPageHandler : TabbedViewHandler
     {
         private static readonly TimeSpan DelayBeforeTabAdded = TimeSpan.FromMilliseconds(50);
 
-        private readonly Dictionary<Element, BadgeView> badgeViews = new Dictionary<Element, BadgeView>();
+        private readonly Dictionary<Page, BadgeView> badgeViews = new Dictionary<Page, BadgeView>();
 
         private TabLayout topTabLayout;
         private LinearLayout topTabStrip;
@@ -31,18 +40,29 @@ namespace Plugin.TabbedPage.Maui.Platform
         protected TabbedPage TabbedPage => this.VirtualView as TabbedPage;
         protected ViewGroup ViewGroup => this.PlatformView as ViewGroup;
 
-        protected override void ConnectHandler(Android.Views.View platformView)
+        protected override void ConnectHandler(View platformView)
         {
             base.ConnectHandler(platformView);
 
-            if (this.VirtualView is TabbedPage customTabbedPage)
+            if (this.VirtualView is TabbedPage tabbedPage)
             {
                 //this.VirtualView.AddCleanUpEvent(); // Not needed because, pages call DisconnectHandler automagically
-                customTabbedPage.Loaded += this.TabbedPage_Loaded;
+                tabbedPage.Loaded += this.OnTabbedPageLoaded;
+                tabbedPage.PropertyChanged += this.OnTabbedPagePropertyChanged;
             }
         }
 
-        private void TabbedPage_Loaded(object sender, EventArgs e)
+        private void OnTabbedPagePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName ||
+                e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
+            {
+                this.UpdateTabbedPageFont();
+            }
+        }
+
+        private void OnTabbedPageLoaded(object sender, EventArgs e)
         {
             this.Cleanup(this.TabbedPage);
 
@@ -70,6 +90,7 @@ namespace Plugin.TabbedPage.Maui.Platform
             if (this.IsBottomTabPlacement)
             {
                 this.bottomNavigationView = ReflectionHelper.GetFieldValue<BottomNavigationView>(tabbedPageManager, "_bottomNavigationView");
+                this.UpdateTabbedPageFont();
                 this.bottomTabStrip = this.bottomNavigationView?.GetChildAt(0) as ViewGroup;
                 if (this.bottomTabStrip == null)
                 {
@@ -86,6 +107,53 @@ namespace Plugin.TabbedPage.Maui.Platform
 
                 this.topTabStrip = this.topTabLayout.FindChildOfType<LinearLayout>();
             }
+        }
+
+        private void UpdateTabbedPageFont()
+        {
+            var fontFamily = TabbedPageExtensions.GetFontFamily(this.TabbedPage);
+            var fontSize = TabbedPageExtensions.GetFontSize(this.TabbedPage);
+            var fontAttributes = TabbedPageExtensions.GetFontAttributes(this.TabbedPage);
+
+            if (Equals(fontFamily, TabbedPageExtensions.FontFamilyProperty.DefaultValue) &&
+                Equals(fontSize, TabbedPageExtensions.FontSizeProperty.DefaultValue) &&
+                Equals(fontAttributes, TabbedPageExtensions.FontAttributesProperty.DefaultValue))
+            {
+                return;
+            }
+
+            var typefaceResolver = this.GetRequiredService<ITypefaceResolver>();
+            var typeface = typefaceResolver.GetTypeface(
+                fontFamily,
+                fontSize,
+                fontAttributes);
+
+            var fontSizePx = this.ConvertFontSizeFromDpToPx(fontSize);
+
+            if (this.IsBottomTabPlacement)
+            {
+                var menu = this.bottomNavigationView.Menu;
+                for (var i = 0; i < this.bottomNavigationView.Menu.Size(); i++)
+                {
+                    var menuItem = menu.GetItem(i);
+                    var title = menuItem.TitleFormatted;
+                    var sb = new SpannableStringBuilder(title);
+                    var typefaceSpan = new CustomTypefaceSpan(fontFamily, fontSizePx, typeface);
+                    sb.SetSpan(typefaceSpan, 0, sb.Length(), SpanTypes.InclusiveInclusive);
+                    menuItem.SetTitle(sb);
+                }
+            }
+            else
+            {
+                // TODO: Implement for top navigation view
+                //throw new NotImplementedException();
+            }
+        }
+
+        private float ConvertFontSizeFromDpToPx(double dp)
+        {
+            var density = this.Context.Resources.DisplayMetrics.Density;
+            return (float)(dp * density);
         }
 
         private int GetTabsCount()
@@ -105,7 +173,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 return;
             }
 
-            var page = this.TabbedPage.GetChildPageWithBadge(tabIndex);
+            var page = PageHelper.GetChildPageWithBadge(this.TabbedPage, tabIndex);
 
             AView targetView;
             var isBottomTabPlacement = this.IsBottomTabPlacement;
@@ -122,7 +190,6 @@ namespace Plugin.TabbedPage.Maui.Platform
                 }
             }
 
-
             if (targetView is not BottomNavigationItemView targetLayout)
             {
                 Trace.WriteLine("Plugin.TabbedPage.Maui: Badge target cannot be null. Badge not added.");
@@ -132,12 +199,7 @@ namespace Plugin.TabbedPage.Maui.Platform
             targetLayout.SetClipChildren(false);
             targetLayout.SetClipToPadding(false);
 
-            // var b = this.bottomNavigationView.GetOrCreateBadge(targetLayout.Id);
-            // b.BadgeTextColor
             var badgeView = targetLayout.FindChildOfType<BadgeView>();
-
-            // var badgeView = targetLayout.Badge;
-
             if (badgeView == null)
             {
                 var imageView = targetLayout.FindChildOfType<ImageView>();
@@ -161,69 +223,109 @@ namespace Plugin.TabbedPage.Maui.Platform
             this.badgeViews[page] = badgeView;
             badgeView.UpdateFromElement(page);
 
-            page.PropertyChanged -= this.OnTabbedPagePropertyChanged;
-            page.PropertyChanged += this.OnTabbedPagePropertyChanged;
-        }
-
-
-        private static IEnumerable<Page> GetChildPages(TabbedPage tabbedPage)
-        {
-            foreach (var child in tabbedPage.Children)
-            {
-                if (child is NavigationPage navigationPage)
-                {
-                    yield return navigationPage.RootPage;
-                }
-                else
-                {
-                    yield return child;
-                }
-            }
+            page.PropertyChanged -= this.OnPagePropertyChanged;
+            page.PropertyChanged += this.OnPagePropertyChanged;
         }
 
         private static int GetTabIndex(TabbedPage tabbedPage, Page page)
         {
-            var tabPages = GetChildPages(tabbedPage).ToList();
+            var tabPages = PageHelper.GetChildPages(tabbedPage).ToList();
             var tabIndex = tabPages.IndexOf(page);
             return tabIndex;
         }
 
-        protected virtual void OnTabbedPagePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        protected virtual void OnPagePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is not Element element)
+            if (sender is not Page page)
             {
                 return;
             }
 
             if (e.PropertyName == Page.TitleProperty.PropertyName)
             {
-                var page = (Page)sender;
                 var index = GetTabIndex(this.TabbedPage, page);
                 if (index != -1)
                 {
                     if (this.IsBottomTabPlacement)
                     {
-                        var tab = this.bottomNavigationView.Menu.GetItem(index);
-                        tab?.SetTitle(page.Title);
+                        var menuItem = this.bottomNavigationView.Menu.GetItem(index);
+                        if (menuItem != null)
+                        {
+                            if (menuItem.TitleFormatted?.ToString() != page.Title)
+                            {
+                                menuItem.SetTitle(page.Title);
+
+                                MainThread.BeginInvokeOnMainThread(async () =>
+                                {
+                                    // HACK: This delay is necessary because we want to update the tab font
+                                    // after MAUI's TabbedPageManager has finished updating the title text.
+                                    // https://github.com/dotnet/maui/blob/ef1ec07908eda7b7bf9979fbbf9c374fbe7f2acf/src/Controls/src/Core/Platform/Android/TabbedPageManager.cs#L420
+                                    await Task.Delay(10);
+                                    this.UpdateTabbedPageFont();
+                                });
+                            }
+                        }
                     }
                     else
                     {
                         var tab = this.topTabLayout.GetTabAt(index);
-                        tab?.SetText(page.Title);
+                        if (tab != null)
+                        {
+                            tab.SetText(page.Title);
+                        }
                     }
                 }
             }
-
-            if (this.badgeViews.TryGetValue(element, out var badgeView))
+            else  if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                      e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName||
+                      e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
             {
-                badgeView.UpdateFromPropertyChangedEvent(element, e);
+                this.UpdateTabbedPageFont();
+            }
+
+            if (this.badgeViews.TryGetValue(page, out var badgeView))
+            {
+                if (e.PropertyName == TabBadge.BadgeTextProperty.PropertyName)
+                {
+                    badgeView.Text = TabBadge.GetBadgeText(page);
+                }
+                else if (e.PropertyName == TabBadgeExtensionsAndroid.BadgeColorProperty.PropertyName)
+                {
+                    var badgeColor = TabBadgeExtensionsAndroid.GetBadgeColor(page);
+                    badgeView.BadgeColor = badgeColor.ToPlatform();
+                }
+                else if (e.PropertyName == TabBadgeExtensionsAndroid.BadgeTextColorProperty.PropertyName)
+                {
+                    var badgeTextColor = TabBadgeExtensionsAndroid.GetBadgeTextColor(page);
+                    badgeView.TextColor = badgeTextColor.ToPlatform();
+                }
+                else if (e.PropertyName == TabBadge.BadgeFontProperty.PropertyName)
+                {
+                    var fontManager = page.Handler.GetRequiredService<IFontManager>();
+                    var badgeFont = TabBadge.GetBadgeFont(page);
+                    badgeView.Typeface = badgeFont.ToTypeface(fontManager);
+                }
+                else if (e.PropertyName == TabBadge.BadgePositionProperty.PropertyName)
+                {
+                    badgeView.Postion = TabBadge.GetBadgePosition(page);
+                }
+                else if (e.PropertyName == TabBadge.BadgeMarginProperty.PropertyName)
+                {
+                    var badgeMargin = TabBadge.GetBadgeMargin(page);
+                    badgeView.SetMargins((float)badgeMargin.Left, (float)badgeMargin.Top, (float)badgeMargin.Right, (float)badgeMargin.Bottom);
+                }
             }
         }
 
         private void OnTabRemoved(object sender, ElementEventArgs e)
         {
-            e.Element.PropertyChanged -= this.OnTabbedPagePropertyChanged;
-            this.badgeViews.Remove(e.Element);
+            if (e.Element is not Page page)
+            {
+                return;
+            }
+
+            page.PropertyChanged -= this.OnPagePropertyChanged;
+            this.badgeViews.Remove(page);
         }
 
         private async void OnTabAdded(object sender, ElementEventArgs e)
@@ -242,28 +344,29 @@ namespace Plugin.TabbedPage.Maui.Platform
         {
             base.DisconnectHandler(platformView);
 
-            if (this.VirtualView is TabbedPage customTabbedPage)
+            if (this.VirtualView is TabbedPage tabbedPage)
             {
-                customTabbedPage.Loaded -= this.TabbedPage_Loaded;
+                tabbedPage.Loaded -= this.OnTabbedPageLoaded;
+                tabbedPage.PropertyChanged -= this.OnTabbedPagePropertyChanged;
             }
 
             this.Cleanup(this.TabbedPage);
         }
 
-        private void Cleanup(TabbedPage page)
+        private void Cleanup(TabbedPage tabbedPage)
         {
-            if (page == null)
+            if (tabbedPage == null)
             {
                 return;
             }
 
-            foreach (var tab in page.Children.Select(c => c.GetPageWithBadge()))
+            foreach (var page in tabbedPage.Children.Select(PageHelper.GetPageWithBadge))
             {
-                tab.PropertyChanged -= this.OnTabbedPagePropertyChanged;
+                page.PropertyChanged -= this.OnPagePropertyChanged;
             }
 
-            page.ChildRemoved -= this.OnTabRemoved;
-            page.ChildAdded -= this.OnTabAdded;
+            tabbedPage.ChildRemoved -= this.OnTabRemoved;
+            tabbedPage.ChildAdded -= this.OnTabAdded;
 
             this.badgeViews.Clear();
             this.topTabLayout = null;

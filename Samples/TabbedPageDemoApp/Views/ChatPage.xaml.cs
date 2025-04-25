@@ -1,4 +1,6 @@
 
+using TabbedPageDemoApp.ViewModels;
+
 namespace TabbedPageDemoApp.Views
 {
     public partial class ChatPage : ContentPage
@@ -6,6 +8,7 @@ namespace TabbedPageDemoApp.Views
         public ChatPage()
         {
             this.InitializeComponent();
+            this.BindingContext = IPlatformApplication.Current.Services.GetService<ChatViewModel>();
         }
     }
 }

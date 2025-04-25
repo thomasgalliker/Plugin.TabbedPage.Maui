@@ -3,16 +3,60 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:TabbedPageDemoApp.Controls"
+    xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
+    xmlns:ta="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Plugin.TabbedPage.Maui"
+    xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.HomePage"
-    Title="HomePage"
-    t:TabBadge.BadgeText="1"
-    IconImageSource="{controls:ImageResource ic_chevron_down}">
+    Title="{s:Translate HomePage_Title}"
+    t:TabBadge.BadgeText="{Binding Counter}"
+    ta:TabBadge.BadgeColor="{StaticResource Primary}"
+    ta:TabBadge.BadgeTextColor="{StaticResource White}"
+    x:DataType="vm:HomeViewModel">
 
-    <VerticalStackLayout>
-        <Label
-            Text="TabbedPage extensions for .NET MAUI"
-            HorizontalOptions="Center"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+    <ContentPage.Behaviors>
+        <mct:EventToCommandBehavior
+            Command="{Binding AppearingCommand}"
+            EventName="Appearing" />
+    </ContentPage.Behaviors>
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="16"
+            Spacing="16"
+            VerticalOptions="Start">
+
+            <Grid
+                ColumnDefinitions="Auto, *"
+                ColumnSpacing="10">
+                <Image
+                    Grid.Column="0"
+                    Source="logo.png"
+                    HeightRequest="100" />
+                <Label Grid.Column="1">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="MAUI sample app with extended features for TabbedPage. This sample app is used to demonstrate and test the main features of the nuget package " />
+                            <Span
+                                Style="{StaticResource HyperlinkSpanStyle}"
+                                Text="Plugin.TabbedPage.Maui">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding OpenUrlCommand}"
+                                        CommandParameter="https://www.nuget.org/packages/Plugin.TabbedPage.Maui" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                            <Span Text="." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
+
+            <controls:DividerLine />
+
+            <Label Text="{Binding Counter, StringFormat='{}Counter={0}'}" />
+            <Stepper Value="{Binding Counter}" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
