@@ -128,7 +128,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 fontSize,
                 fontAttributes);
 
-            var fontSizePx = this.ConvertFontSizeFromDpToPx(fontSize);
+            var fontSizePx = PixelConverter.DipToPixels(this.Context, (float)fontSize);
 
             if (this.IsBottomTabPlacement)
             {
@@ -148,12 +148,6 @@ namespace Plugin.TabbedPage.Maui.Platform
                 // TODO: Implement for top navigation view
                 //throw new NotImplementedException();
             }
-        }
-
-        private float ConvertFontSizeFromDpToPx(double dp)
-        {
-            var density = this.Context.Resources.DisplayMetrics.Density;
-            return (float)(dp * density);
         }
 
         private int GetTabsCount()

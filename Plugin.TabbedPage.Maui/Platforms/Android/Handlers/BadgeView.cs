@@ -12,6 +12,7 @@ using Context = Android.Content.Context;
 using ShapeDrawable = Android.Graphics.Drawables.ShapeDrawable;
 using Plugin.TabbedPage.Maui.Controls;
 using System.Diagnostics;
+using Plugin.TabbedPage.Maui.Utils;
 
 namespace Plugin.TabbedPage.Maui.Platform.Handlers
 {
@@ -75,10 +76,10 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
 
         public void SetMargins(float left, float top, float right, float bottom)
         {
-            this.badgeMarginL = this.DipToPixels(left);
-            this.badgeMarginT = this.DipToPixels(top);
-            this.badgeMarginR = this.DipToPixels(right);
-            this.badgeMarginB = this.DipToPixels(bottom);
+            this.badgeMarginL = PixelConverter.DipToPixels(this.Context, left);
+            this.badgeMarginT = PixelConverter.DipToPixels(this.Context, top);
+            this.badgeMarginR = PixelConverter.DipToPixels(this.Context, right);
+            this.badgeMarginB = PixelConverter.DipToPixels(this.Context, bottom);
 
             this.ApplyLayoutParams();
         }
@@ -120,7 +121,7 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             this.context = context;
 
             this.Typeface = Typeface.DefaultBold;
-            var paddingPixels = this.DipToPixels(DefaultLrPaddingDip);
+            var paddingPixels = PixelConverter.DipToPixels(this.context, DefaultLrPaddingDip);
             this.SetPadding(paddingPixels, 0, paddingPixels, 0);
             this.SetTextColor(Color.White);
             this.SetTextSize(ComplexUnitType.Dip, TextSizeDip);
@@ -138,7 +139,7 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
 
         private ShapeDrawable CreateBackgroundShape()
         {
-            var radius = this.DipToPixels(DefaultCornerRadiusDip);
+            var radius = PixelConverter.DipToPixels(this.context, DefaultCornerRadiusDip);
             var outerR = new float[] { radius, radius, radius, radius, radius, radius, radius, radius };
 
             return new ShapeDrawable(new RoundRectShape(outerR, null, null));
@@ -312,11 +313,6 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             }
 
             this.LayoutParameters = layoutParameters;
-        }
-
-        private int DipToPixels(float dip)
-        {
-            return (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, dip, this.Resources.DisplayMetrics);
         }
 
         public new string Text
