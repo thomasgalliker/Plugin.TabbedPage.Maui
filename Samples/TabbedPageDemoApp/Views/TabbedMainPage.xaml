@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:behaviors="clr-namespace:Plugin.TabbedPage.Maui.Behaviors;assembly=Plugin.TabbedPage.Maui"
     xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
@@ -22,6 +23,11 @@
     ti:TabbedPage.NormalBadgeBackgroundColor="{StaticResource Gray500}"
     ti:TabbedPage.SelectedBadgeBackgroundColor="{StaticResource Primary}"
     x:DataType="vm:TabbedMainViewModel">
+    <TabbedPage.Behaviors>
+        <t:ItemReselectedBehavior
+            ItemReselected="OnItemReselected"
+            ItemReselectedCommand="{Binding ItemReselectedCommand}" />
+    </TabbedPage.Behaviors>
 
     <!--  t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"  -->
     <!--  t:TabbedPage.FontFamily="{StaticResource FontFamilyMonospace}"  -->
