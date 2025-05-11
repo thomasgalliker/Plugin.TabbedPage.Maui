@@ -64,7 +64,7 @@ namespace Plugin.TabbedPage.Maui.Platform
         {
             if (Equals(this.previousTabBarItem, item))
             {
-                var tabIndex = this.SelectedIndex;
+                var tabIndex = (int)this.SelectedIndex;
                 var page = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
 
                 var itemReselectedBehavior = this.Tabbed.Behaviors.FirstOrDefault<ItemReselectedBehavior>();
