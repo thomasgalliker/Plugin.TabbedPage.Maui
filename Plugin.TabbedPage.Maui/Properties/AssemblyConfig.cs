@@ -6,3 +6,4 @@
 
 [assembly: XmlnsDefinition("http://plugin.tabbedpage.maui", "Plugin.TabbedPage.Maui")]
 [assembly: XmlnsDefinition("http://plugin.tabbedpage.maui", "Plugin.TabbedPage.Maui.Controls")]
+[assembly: XmlnsDefinition("http://plugin.tabbedpage.maui", "Plugin.TabbedPage.Maui.Behaviors")]

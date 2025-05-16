@@ -12,12 +12,12 @@ using View = Android.Views.View;
 using Plugin.TabbedPage.Maui.Utils;
 using System.Diagnostics;
 using Android.Text;
-using Android.Text.Style;
+using Google.Android.Material.Navigation;
 using Microsoft.Maui.Platform;
+using Plugin.TabbedPage.Maui.Behaviors;
 using Plugin.TabbedPage.Maui.Extensions;
 using Plugin.TabbedPage.Maui.Controls;
 using Plugin.TabbedPage.Maui.Platform.Handlers;
-using Application = Microsoft.Maui.Controls.Application;
 
 namespace Plugin.TabbedPage.Maui.Platform
 {
@@ -29,6 +29,7 @@ namespace Plugin.TabbedPage.Maui.Platform
     public class BadgedTabbedPageHandler : TabbedViewHandler
     {
         private static readonly TimeSpan DelayBeforeTabAdded = TimeSpan.FromMilliseconds(50);
+        private static readonly TimeSpan DelayBeforeItemReselected = TimeSpan.FromMilliseconds(300);
 
         private readonly Dictionary<Page, BadgeView> badgeViews = new Dictionary<Page, BadgeView>();
 
@@ -37,6 +38,7 @@ namespace Plugin.TabbedPage.Maui.Platform
         private ViewGroup bottomTabStrip;
         private BottomNavigationView bottomNavigationView;
 
+        private new TabbedPage VirtualView => (TabbedPage)base.VirtualView;
         protected TabbedPage TabbedPage => this.VirtualView as TabbedPage;
         protected ViewGroup ViewGroup => this.PlatformView as ViewGroup;
 
@@ -76,6 +78,19 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             this.TabbedPage.ChildAdded += this.OnTabAdded;
             this.TabbedPage.ChildRemoved += this.OnTabRemoved;
+
+            if (this.IsBottomTabPlacement)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(DelayBeforeItemReselected);
+                    this.bottomNavigationView.ItemReselected += this.OnItemReselected;
+                });
+            }
+            else
+            {
+                // TODO
+            }
         }
 
         private bool IsBottomTabPlacement
@@ -132,10 +147,9 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             if (this.IsBottomTabPlacement)
             {
-                var menu = this.bottomNavigationView.Menu;
-                for (var i = 0; i < this.bottomNavigationView.Menu.Size(); i++)
+                var menuItems = this.bottomNavigationView.GetAllItems().ToArray();
+                foreach (var menuItem in menuItems)
                 {
-                    var menuItem = menu.GetItem(i);
                     var title = menuItem.TitleFormatted;
                     var sb = new SpannableStringBuilder(title);
                     var typefaceSpan = new CustomTypefaceSpan(fontFamily, fontSizePx, typeface);
@@ -147,6 +161,27 @@ namespace Plugin.TabbedPage.Maui.Platform
             {
                 // TODO: Implement for top navigation view
                 //throw new NotImplementedException();
+            }
+        }
+
+        private void OnItemReselected(object sender, NavigationBarView.ItemReselectedEventArgs e)
+        {
+            var tabIndex = this.bottomNavigationView.GetTabIndex(e.Item);
+            if (tabIndex != null)
+            {
+                var page = PageHelper.GetChildPageWithBadge(this.TabbedPage, tabIndex.Value);
+
+                var itemReselectedBehavior = this.TabbedPage.Behaviors.FirstOrDefault<ItemReselectedBehavior>();
+                if (itemReselectedBehavior != null)
+                {
+                    itemReselectedBehavior.RaiseItemReselectedEvent(page);
+
+                    var itemReselectedCommand = itemReselectedBehavior.ItemReselectedCommand;
+                    if (itemReselectedCommand != null && itemReselectedCommand.CanExecute(page))
+                    {
+                        itemReselectedCommand.Execute(page);
+                    }
+                }
             }
         }
 
@@ -206,9 +241,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                 else
                 {
                     // Create badge for tab image or text
-                    View target = imageView?.Drawable != null ?
-                        imageView :
-                        targetLayout.FindChildOfType<TextView>();
+                    View target = imageView?.Drawable != null ? imageView : targetLayout.FindChildOfType<TextView>();
 
                     badgeView = BadgeView.ForTarget(this.Context, target);
                 }
@@ -270,9 +303,9 @@ namespace Plugin.TabbedPage.Maui.Platform
                     }
                 }
             }
-            else  if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
-                      e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName||
-                      e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
+            else if (e.PropertyName == TabbedPageExtensions.FontFamilyProperty.PropertyName ||
+                     e.PropertyName == TabbedPageExtensions.FontSizeProperty.PropertyName ||
+                     e.PropertyName == TabbedPageExtensions.FontAttributesProperty.PropertyName)
             {
                 this.UpdateTabbedPageFont();
             }
@@ -306,7 +339,8 @@ namespace Plugin.TabbedPage.Maui.Platform
                 else if (e.PropertyName == TabBadge.BadgeMarginProperty.PropertyName)
                 {
                     var badgeMargin = TabBadge.GetBadgeMargin(page);
-                    badgeView.SetMargins((float)badgeMargin.Left, (float)badgeMargin.Top, (float)badgeMargin.Right, (float)badgeMargin.Bottom);
+                    badgeView.SetMargins((float)badgeMargin.Left, (float)badgeMargin.Top, (float)badgeMargin.Right,
+                        (float)badgeMargin.Bottom);
                 }
             }
         }
@@ -361,6 +395,11 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             tabbedPage.ChildRemoved -= this.OnTabRemoved;
             tabbedPage.ChildAdded -= this.OnTabAdded;
+
+            if (this.bottomNavigationView != null)
+            {
+                this.bottomNavigationView.ItemReselected -= this.OnItemReselected;
+            }
 
             this.badgeViews.Clear();
             this.topTabLayout = null;

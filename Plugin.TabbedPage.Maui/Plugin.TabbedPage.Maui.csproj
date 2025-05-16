@@ -25,7 +25,7 @@
   <!--NuGet package-->
   <PropertyGroup>
     <Product>Plugin.TabbedPage.Maui</Product>
-    <Description>TabbedPage extensions for .NET MAUI</Description>
+    <Description>Extended Features for TabbedPage in .NET MAUI</Description>
     <Version>1.0.0</Version>
     <Authors>Thomas Galliker</Authors>
     <PackageId>Plugin.TabbedPage.Maui</PackageId>
@@ -37,7 +37,10 @@
     <RepositoryUrl>https://github.com/thomasgalliker/Plugin.TabbedPage.Maui</RepositoryUrl>
     <Company>superdev GmbH</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageReleaseNotes>1.0
+    <PackageReleaseNotes>1.1
+- Add item reselection feature.
+
+1.0
 - Initial release.
     </PackageReleaseNotes>
     <Copyright>Copyright $([System.DateTime]::Now.ToString(`yyyy`)) © Thomas Galliker</Copyright>

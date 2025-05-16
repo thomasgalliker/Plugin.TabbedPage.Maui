@@ -4,7 +4,7 @@ namespace Plugin.TabbedPage.Maui.Controls
 {
     public class Badge : Frame
     {
-        public static BindableProperty BadgeTextProperty = BindableProperty.Create(
+        public static readonly BindableProperty BadgeTextProperty = BindableProperty.Create(
             nameof(BadgeText),
             typeof(string),
             typeof(Badge),
@@ -16,7 +16,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeTextProperty, value);
         }
 
-        public static BindableProperty BadgeTextColorProperty = BindableProperty.Create(
+        public static readonly BindableProperty BadgeTextColorProperty = BindableProperty.Create(
             nameof(BadgeTextColor),
             typeof(Color),
             typeof(Badge),
@@ -28,7 +28,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeTextColorProperty, value);
         }
 
-        public static BindableProperty BadgeFontAttributesProperty = BindableProperty.Create(
+        public static readonly BindableProperty BadgeFontAttributesProperty = BindableProperty.Create(
             nameof(BadgeFontAttributes),
             typeof(FontAttributes),
             typeof(Badge),
@@ -41,7 +41,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeFontAttributesProperty, value);
         }
 
-        public static BindableProperty BadgeFontFamilyProperty = BindableProperty.Create(
+        public static readonly BindableProperty BadgeFontFamilyProperty = BindableProperty.Create(
             nameof(BadgeFontFamily),
             typeof(string),
             typeof(Badge),
@@ -54,7 +54,7 @@ namespace Plugin.TabbedPage.Maui.Controls
             set => this.SetValue(BadgeFontFamilyProperty, value);
         }
 
-        public static BindableProperty BadgeFontSizeProperty = BindableProperty.Create(
+        public static readonly BindableProperty BadgeFontSizeProperty = BindableProperty.Create(
             nameof(BadgeFontSizeProperty),
             typeof(double),
             typeof(Badge),
