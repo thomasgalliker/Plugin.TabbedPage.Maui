@@ -7,7 +7,7 @@ namespace TabbedPageDemoApp.ViewModels
     public class HomeViewModel : ObservableObject
     {
         private readonly INavigationService navigationService;
-        private readonly ILauncher launcher;
+        private readonly IBrowser browser;
 
         private IRelayCommand appearingCommand;
         private IAsyncRelayCommand<string> navigateToPageCommand;
@@ -16,10 +16,10 @@ namespace TabbedPageDemoApp.ViewModels
 
         public HomeViewModel(
             INavigationService navigationService,
-            ILauncher launcher)
+            IBrowser browser)
         {
             this.navigationService = navigationService;
-            this.launcher = launcher;
+            this.browser = browser;
         }
 
         public IRelayCommand AppearingCommand
@@ -57,12 +57,26 @@ namespace TabbedPageDemoApp.ViewModels
         {
             try
             {
-                await this.launcher.TryOpenAsync(url);
+                var options = GetDefaultBrowserLaunchOptions();
+                await this.browser.OpenAsync(new Uri(url), options);
             }
             catch
             {
                 // Ignore exceptions
             }
+        }
+
+        private static BrowserLaunchOptions GetDefaultBrowserLaunchOptions()
+        {
+            var options = new BrowserLaunchOptions
+            {
+                LaunchMode = BrowserLaunchMode.SystemPreferred,
+                TitleMode = BrowserTitleMode.Show,
+                PreferredToolbarColor = Application.Current.Resources["Primary"] as Color,
+                PreferredControlColor = Colors.White,
+                Flags = BrowserLaunchFlags.None
+            };
+            return options;
         }
     }
 }

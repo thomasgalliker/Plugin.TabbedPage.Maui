@@ -11,7 +11,7 @@ namespace TabbedPageDemoApp.Services.Logging
 #if DEBUG
             options.Debug = true;
 #endif
-            options.Dsn = "https://81933794fef907d63e866ccab72248f1@o4507458300280832.ingest.de.sentry.io/4507570985173072";
+            options.Dsn = "https://87269f9f504ed34336b9a7beff165764@o4507458300280832.ingest.de.sentry.io/4510028090376272";
             options.MinimumEventLevel = LogLevel.Warning;
             options.MinimumBreadcrumbLevel = LogLevel.Debug;
         }

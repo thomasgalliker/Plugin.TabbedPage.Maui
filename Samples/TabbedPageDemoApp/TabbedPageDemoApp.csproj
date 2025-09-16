@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
+		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>TabbedPageDemoApp</RootNamespace>
 		<UseMaui>true</UseMaui>
-		<MauiVersion>8.0.100</MauiVersion>
+		<MauiVersion>9.0.110</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -14,14 +14,17 @@
 		<ApplicationTitle>TabbedPageDemoApp</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.TabbedPageDemoApp</ApplicationId>
+		<ApplicationId>ch.superdev.tappedpagedemoapp</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
+
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU;Device;Simulator</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -48,6 +51,8 @@
   
   <!-- Android build properties -->
   <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion> <!-- android:minSdkVersion -->
+    <TargetPlatformVersion>35</TargetPlatformVersion> <!-- android:targetSdkVersion -->
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <UseInterpreter>false</UseInterpreter>
     <AndroidUseAapt2>true</AndroidUseAapt2>
@@ -71,6 +76,7 @@
 
   <!-- iOS build properties -->
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <SupportedOSPlatformVersion>12.2</SupportedOSPlatformVersion> <!-- MinimumOSVersion -->
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
@@ -95,14 +101,14 @@
   </PropertyGroup>
   
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.1" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="Sentry.Extensions.Logging" Version="4.8.1" />
-		<PackageReference Include="Superdev.Maui" Version="1.0.60-pre" />
-		<PackageReference Include="ValueConverters.MAUI" Version="3.0.26" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+		<PackageReference Include="Sentry.Extensions.Logging" Version="5.15.0" />
+		<PackageReference Include="Superdev.Maui" Version="1.0.127-pre" />
+		<PackageReference Include="ValueConverters.MAUI" Version="3.1.22" />
 	</ItemGroup>
 
 	<ItemGroup>

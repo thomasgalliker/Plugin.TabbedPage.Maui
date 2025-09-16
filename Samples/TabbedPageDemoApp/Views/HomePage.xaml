@@ -57,6 +57,13 @@
 
             <Label Text="{Binding Counter, StringFormat='{}Counter={0}'}" />
             <Stepper Value="{Binding Counter}" />
+
+            <controls:DividerLine />
+
+            <Button
+                Command="{Binding NavigateToPageCommand}"
+                CommandParameter="AccountPage"
+                Text="AccountPage" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
