@@ -15,7 +15,8 @@ namespace Plugin.TabbedPage.Maui.Extensions
 			return services;
 		}
 
-		public static T GetRequiredService<T>(this IElementHandler handler)
+#if !NET9_0_OR_GREATER
+        public static T GetRequiredService<T>(this IElementHandler handler)
 			where T : notnull
 		{
 			var services = handler.GetServiceProvider();
@@ -24,5 +25,6 @@ namespace Plugin.TabbedPage.Maui.Extensions
 
 			return service;
 		}
+#endif
 	}
 }
