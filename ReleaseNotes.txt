@@ -1,0 +1,8 @@
+1.2
+- Fix for ToolbarPlacement.Top on Android.
+
+1.1
+- Add item reselection event.
+
+1.0
+- Initial release.
