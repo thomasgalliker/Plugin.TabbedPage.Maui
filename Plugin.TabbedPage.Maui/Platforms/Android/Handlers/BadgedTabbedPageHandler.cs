@@ -204,22 +204,24 @@ namespace Plugin.TabbedPage.Maui.Platform
 
             var page = PageHelper.GetChildPageWithBadge(this.TabbedPage, tabIndex);
 
-            AView targetView;
+            ViewGroup targetLayout;
             var isBottomTabPlacement = this.IsBottomTabPlacement;
             if (isBottomTabPlacement)
             {
-                targetView = this.bottomTabStrip?.GetChildAt(tabIndex);
+                targetLayout = this.bottomTabStrip?.GetChildAt(tabIndex) as BottomNavigationItemView;
             }
             else
             {
-                targetView = this.topTabLayout?.GetTabAt(tabIndex).CustomView;
+                var targetView = this.topTabLayout?.GetTabAt(tabIndex).CustomView;
                 if (targetView == null)
                 {
                     targetView = this.topTabStrip?.GetChildAt(tabIndex);
                 }
+
+                targetLayout = targetView as TabLayout.TabView;
             }
 
-            if (targetView is not BottomNavigationItemView targetLayout)
+            if (targetLayout == null)
             {
                 Trace.WriteLine("Plugin.TabbedPage.Maui: Badge target cannot be null. Badge not added.");
                 return;
