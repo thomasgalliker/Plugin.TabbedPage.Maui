@@ -21,6 +21,9 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
         private const int DefaultLrPaddingDip = 4;
         private const int DefaultCornerRadiusDip = 7;
 
+        private const int BadgeMarginVerticalOffset = -15;
+        private const int BadgeMarginHorizontalOffset = -20;
+
         private static Animation FadeInAnimation;
         private static Animation FadeOutAnimation;
 
@@ -28,7 +31,6 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
         private readonly Color defaultBadgeColor = Color.ParseColor("#CCFF0000");
         private ShapeDrawable backgroundShape;
         private BadgePosition position;
-
 
         private int badgeMarginL;
         private int badgeMarginR;
@@ -126,9 +128,17 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
             this.SetTextColor(Color.White);
             this.SetTextSize(ComplexUnitType.Dip, TextSizeDip);
 
-            FadeInAnimation = new AlphaAnimation(0, 1) { Interpolator = new DecelerateInterpolator(), Duration = 200 };
+            FadeInAnimation = new AlphaAnimation(0, 1)
+            {
+                Interpolator = new DecelerateInterpolator(),
+                Duration = 200
+            };
 
-            FadeOutAnimation = new AlphaAnimation(1, 0) { Interpolator = new AccelerateInterpolator(), Duration = 200 };
+            FadeOutAnimation = new AlphaAnimation(1, 0)
+            {
+                Interpolator = new AccelerateInterpolator(),
+                Duration = 200
+            };
 
             this.backgroundShape = this.CreateBackgroundShape();
             ViewCompat.SetBackground(this, this.backgroundShape);
@@ -199,7 +209,6 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
         {
             this.Show(animate, FadeInAnimation);
         }
-
 
         public void Hide(bool animate)
         {
@@ -275,19 +284,19 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
                 {
                     case BadgePosition.TopLeft:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Top;
-                        layoutParameters.SetMargins(this.badgeMarginL, this.badgeMarginT, 0, 0);
+                        layoutParameters.SetMargins(this.badgeMarginL + BadgeMarginHorizontalOffset, this.badgeMarginT + BadgeMarginVerticalOffset, 0, 0);
                         break;
                     case BadgePosition.TopRight:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Top;
-                        layoutParameters.SetMargins(0, this.badgeMarginT, this.badgeMarginR, 0);
+                        layoutParameters.SetMargins(0, this.badgeMarginT + BadgeMarginVerticalOffset, this.badgeMarginR + BadgeMarginHorizontalOffset, 0);
                         break;
                     case BadgePosition.BottomLeft:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Bottom;
-                        layoutParameters.SetMargins(this.badgeMarginL, 0, 0, this.badgeMarginB);
+                        layoutParameters.SetMargins(this.badgeMarginL + BadgeMarginHorizontalOffset, 0, 0, this.badgeMarginB + BadgeMarginVerticalOffset);
                         break;
                     case BadgePosition.BottomRight:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Bottom;
-                        layoutParameters.SetMargins(0, 0, this.badgeMarginR, this.badgeMarginB);
+                        layoutParameters.SetMargins(0, 0, this.badgeMarginR + BadgeMarginHorizontalOffset, this.badgeMarginB + BadgeMarginVerticalOffset);
                         break;
                     case BadgePosition.Center:
                         layoutParameters.Gravity = GravityFlags.Center;
@@ -295,19 +304,19 @@ namespace Plugin.TabbedPage.Maui.Platform.Handlers
                         break;
                     case BadgePosition.TopCenter:
                         layoutParameters.Gravity = GravityFlags.Center | GravityFlags.Top;
-                        layoutParameters.SetMargins(0, this.badgeMarginT, 0, 0);
+                        layoutParameters.SetMargins(0, this.badgeMarginT + BadgeMarginVerticalOffset, 0, 0);
                         break;
                     case BadgePosition.BottomCenter:
                         layoutParameters.Gravity = GravityFlags.Center | GravityFlags.Bottom;
-                        layoutParameters.SetMargins(0, 0, 0, this.badgeMarginB);
+                        layoutParameters.SetMargins(0, 0, 0, this.badgeMarginB + BadgeMarginVerticalOffset);
                         break;
                     case BadgePosition.LeftCenter:
                         layoutParameters.Gravity = GravityFlags.Left | GravityFlags.Center;
-                        layoutParameters.SetMargins(this.badgeMarginL, 0, 0, 0);
+                        layoutParameters.SetMargins(this.badgeMarginL + BadgeMarginHorizontalOffset, 0, 0, 0);
                         break;
                     case BadgePosition.RightCenter:
                         layoutParameters.Gravity = GravityFlags.Right | GravityFlags.Center;
-                        layoutParameters.SetMargins(0, 0, this.badgeMarginR, 0);
+                        layoutParameters.SetMargins(0, 0, this.badgeMarginR + BadgeMarginHorizontalOffset, 0);
                         break;
                 }
             }

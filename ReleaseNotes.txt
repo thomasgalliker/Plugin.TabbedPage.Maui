@@ -1,5 +1,6 @@
 1.2
 - Fix for ToolbarPlacement.Top on Android.
+- Adjustment of default value for TabPage.BadgeMargin (observer and test badge positioning, if you use BadgeMargin on Android).
 
 1.1
 - Add item reselection event.
