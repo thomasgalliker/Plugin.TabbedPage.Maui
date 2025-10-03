@@ -244,7 +244,6 @@ namespace Plugin.TabbedPage.Maui.Platform
                 {
                     // Create badge for tab image or text
                     View target = imageView?.Drawable != null ? imageView : targetLayout.FindChildOfType<TextView>();
-
                     badgeView = BadgeView.ForTarget(this.Context, target);
                 }
             }

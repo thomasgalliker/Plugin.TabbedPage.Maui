@@ -12,7 +12,7 @@
     x:Class="TabbedPageDemoApp.Views.TabbedMainPage"
     android:TabbedPage.IsSmoothScrollEnabled="False"
     android:TabbedPage.IsSwipePagingEnabled="False"
-    android:TabbedPage.ToolbarPlacement="Top"
+    android:TabbedPage.ToolbarPlacement="Bottom"
     ios:Page.UseSafeArea="True"
     ios:TabbedPage.TranslucencyMode="Opaque"
     t:TabbedPage.FontFamily="{StaticResource FontFamily.IBMPlexSans.Medium}"
