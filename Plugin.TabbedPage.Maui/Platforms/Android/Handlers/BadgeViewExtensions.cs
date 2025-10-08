@@ -1,7 +1,4 @@
-using System.ComponentModel;
 using Android.Views;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
-using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
 using Plugin.TabbedPage.Maui.Controls;
 using Plugin.TabbedPage.Maui.Extensions;

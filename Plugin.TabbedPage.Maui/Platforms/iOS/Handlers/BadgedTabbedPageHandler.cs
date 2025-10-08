@@ -1,14 +1,12 @@
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using CoreFoundation;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Platform;
+using Plugin.TabbedPage.Maui.Behaviors;
 using Plugin.TabbedPage.Maui.Controls;
 using Plugin.TabbedPage.Maui.Extensions;
 using Plugin.TabbedPage.Maui.Utils;
 using UIKit;
-using Font = Microsoft.Maui.Font;
 using Page = Microsoft.Maui.Controls.Page;
 using TabbedRenderer = Microsoft.Maui.Controls.Handlers.Compatibility.TabbedRenderer;
 
@@ -21,6 +19,8 @@ namespace Plugin.TabbedPage.Maui.Platform
     [Preserve]
     public class BadgedTabbedPageHandler : TabbedRenderer
     {
+        private UITabBarItem previousTabBarItem;
+
         protected override void OnElementChanged(VisualElementChangedEventArgs e)
         {
             base.OnElementChanged(e);
@@ -47,6 +47,42 @@ namespace Plugin.TabbedPage.Maui.Platform
             this.Tabbed.ChildAdded += this.OnTabAdded;
             this.Tabbed.ChildRemoved += this.OnTabRemoved;
             this.Tabbed.PropertyChanged += this.OnTabbedPagePropertyChanged;
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            if (this.SelectedIndex is var selectedIndex &&
+                selectedIndex < this.TabBar.Items.Length)
+            {
+                this.previousTabBarItem = this.TabBar.Items[selectedIndex];
+            }
+        }
+
+        public override void ItemSelected(UITabBar tabbar, UITabBarItem item)
+        {
+            if (Equals(this.previousTabBarItem, item))
+            {
+                var tabIndex = (int)this.SelectedIndex;
+                var page = PageHelper.GetChildPageWithBadge(this.Tabbed, tabIndex);
+
+                var itemReselectedBehavior = this.Tabbed.Behaviors.FirstOrDefault<ItemReselectedBehavior>();
+                if (itemReselectedBehavior != null)
+                {
+                    itemReselectedBehavior.RaiseItemReselectedEvent(page);
+
+                    var itemReselectedCommand = itemReselectedBehavior.ItemReselectedCommand;
+                    if (itemReselectedCommand != null && itemReselectedCommand.CanExecute(page))
+                    {
+                        itemReselectedCommand.Execute(page);
+                    }
+                }
+            }
+            else
+            {
+                this.previousTabBarItem = item;
+            }
         }
 
         private void OnTabbedPagePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -215,7 +251,7 @@ namespace Plugin.TabbedPage.Maui.Platform
                     selected => selected.TitleTextAttributes = selectedAttributes);
 
                 UpdateBadgeBackgroundColor(tabBarAppearance,
-                    normal => normal.IconColor =  normalIconColor,
+                    normal => normal.IconColor = normalIconColor,
                     selected => selected.IconColor = selectedIconColor);
             }
 

@@ -42,12 +42,19 @@ namespace TabbedPageDemoApp.ViewModels
                 .Select(ci => new LanguageViewModel(ci))
                 .ToArray();
 
+            CultureInfo cultureInfo;
             var languageSetting = this.preferences.Get<string>("Language", null);
             if (languageSetting != null)
             {
-                this.language = new LanguageViewModel(new CultureInfo(languageSetting));
-                this.OnPropertyChanged(nameof(this.Language));
+                cultureInfo = new CultureInfo(languageSetting);
             }
+            else
+            {
+                cultureInfo = this.localizer.GetCurrentCulture();
+            }
+
+            this.language = new LanguageViewModel(new CultureInfo(cultureInfo.TwoLetterISOLanguageName));
+            this.OnPropertyChanged(nameof(this.Language));
         }
 
         public LanguageViewModel[] Languages

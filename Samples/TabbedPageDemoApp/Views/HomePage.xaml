@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:TabbedPageDemoApp.Controls"
-    xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:s="http://schemas.superdev.ch/dotnet/2021/maui"
     xmlns:t="http://plugin.tabbedpage.maui"
     xmlns:ta="clr-namespace:Plugin.TabbedPage.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Plugin.TabbedPage.Maui"
@@ -16,7 +15,7 @@
     x:DataType="vm:HomeViewModel">
 
     <ContentPage.Behaviors>
-        <mct:EventToCommandBehavior
+        <s:EventToCommandBehavior
             Command="{Binding AppearingCommand}"
             EventName="Appearing" />
     </ContentPage.Behaviors>
@@ -57,6 +56,13 @@
 
             <Label Text="{Binding Counter, StringFormat='{}Counter={0}'}" />
             <Stepper Value="{Binding Counter}" />
+
+            <controls:DividerLine />
+
+            <Button
+                Command="{Binding NavigateToPageCommand}"
+                CommandParameter="AccountPage"
+                Text="AccountPage" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
