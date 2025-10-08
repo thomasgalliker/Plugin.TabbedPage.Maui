@@ -14,6 +14,7 @@ namespace TabbedPageDemoApp.ViewModels
         private Color badgeColor;
         private Color[] badgeTextColors;
         private Color badgeTextColor;
+        private string badgeMargin;
 
         public CarTireAlertViewModel()
         {
@@ -21,6 +22,7 @@ namespace TabbedPageDemoApp.ViewModels
             this.BadgeText = "!";
             this.BadgePositions = Enum.GetValues<BadgePosition>();
             this.BadgePosition = BadgePosition.TopRight;
+            this.BadgeMargin = "0, 0, 0, 0";
 
             this.BadgeColors = new[]
             {
@@ -70,6 +72,12 @@ namespace TabbedPageDemoApp.ViewModels
         {
             get => this.badgePositions;
             private set => this.SetProperty(ref this.badgePositions, value);
+        }
+
+        public string BadgeMargin
+        {
+            get => this.badgeMargin;
+            set => this.SetProperty(ref this.badgeMargin, value);
         }
 
         public Color[] BadgeColors

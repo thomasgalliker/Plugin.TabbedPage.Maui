@@ -10,6 +10,7 @@
     xmlns:vm="clr-namespace:TabbedPageDemoApp.ViewModels"
     x:Class="TabbedPageDemoApp.Views.CarTireAlertPage"
     Title="{s:Translate CarTireAlertPage_Title}"
+    t:TabBadge.BadgeMargin="{Binding BadgeMargin, Converter={StaticResource StringToThicknessConverter}}"
     t:TabBadge.BadgePosition="{Binding BadgePosition}"
     t:TabBadge.BadgeText="{Binding BadgeText}"
     ta:TabBadge.BadgeColor="{Binding BadgeColor}"
@@ -63,6 +64,13 @@
                     ItemDisplayBinding="{Binding .}"
                     ItemsSource="{Binding BadgePositions}"
                     SelectedItem="{Binding BadgePosition}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="BadgeMargin (Android only)" />
+                <s:CustomEntry
+                    Placeholder="left, top, right, bottom"
+                    Text="{Binding BadgeMargin}" />
             </VerticalStackLayout>
 
             <VerticalStackLayout>
